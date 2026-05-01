@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -6,6 +6,39 @@ import './App.css'
 
 function App() {
     const [count, setCount] = useState(0)
+    const [socket, setSocket] = useState< WebSocket & { send_handle: typeof send_handle } | null>(null)
+
+    function send_handle(this: WebSocket, type: string, payload: object) {
+        this.send(JSON.stringify({
+            "type": type,
+            "payload": payload,
+        }))
+    }
+
+    useEffect(() => {
+        const ws_ = new WebSocket('ws://localhost:3000/websocket')
+        const ws = ws_ as WebSocket & { send_handle: typeof send_handle };
+        ws.send_handle = send_handle;
+
+        ws.onopen = (event) => {
+            setSocket(ws)
+        }
+
+        ws.onmessage = (event) => {
+            console.log('Message from server:', event.data)
+        }
+
+        ws.onclose = (event) => {
+            console.log('Disconnected');
+        }
+
+    }, [])
+
+    function sendPING() {
+        if (socket) {
+            socket.send_handle("PING", {});
+        }
+    }
 
     return (
         <>
@@ -24,7 +57,8 @@ function App() {
                 <button
                     type="button"
                     className="counter"
-                    onClick={() => setCount((count) => count + 1)}
+                    // onClick={() => setCount((count) => count + 1)}
+                    onClick={() => sendPING()}
                 >
                     Count is {count}
                 </button>
