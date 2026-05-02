@@ -40,6 +40,31 @@ function App() {
         }
     }
 
+    async function createUser() {
+        const element = document.getElementById("name_input");
+        if (!element) {
+            console.log("ERROR: unable to find #name_input")
+            return;
+        }
+        const input = element as HTMLInputElement;
+        const name: string = input.value;
+        const base_url = 'http://localhost:3000/create-user';
+        const params = new URLSearchParams({name});
+        const url = (name.length > 0)? `${base_url}?${params}` : base_url;
+        const result = await fetch(url, {});
+        const payload = await result.json();
+        console.log(result);
+
+        const output = document.getElementById("test-output");
+        if (!output) {
+            console.log("ERROR: unable to find #test-output")
+            return;
+        }
+        output.textContent = "User created with id #" + payload.user_id;
+
+
+    }
+
     return (
         <>
             <section id="center">
@@ -54,14 +79,16 @@ function App() {
                         Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
                     </p>
                 </div>
+                <input type="text" id="name_input"/>
                 <button
                     type="button"
                     className="counter"
                     // onClick={() => setCount((count) => count + 1)}
-                    onClick={() => sendPING()}
+                    onClick={() => createUser()}
                 >
                     Count is {count}
                 </button>
+                <p id={'test-output'}></p>
             </section>
 
             <div className="ticks"></div>
