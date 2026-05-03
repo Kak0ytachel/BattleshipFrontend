@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react'
 import {useLocalStorage} from "usehooks-ts";
+import {jwtDecode} from "jwt-decode";
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -8,9 +9,24 @@ import './App.css'
 function App() {
     const [count, setCount] = useState(0)
     const [socket, setSocket] = useState< WebSocket & { send_handle: typeof send_handle } | null>(null)
-    const [token, setToken] = useLocalStorage<string | null>('token', null);
-    const [refresh_token, setRefreshToken] = useLocalStorage<string | null>('refresh_token', null);
+    // const [token, setToken] = useLocalStorage<string | null>('token', null);
+    // const [refresh_token, setRefreshToken] = useLocalStorage<string | null>('refresh_token', null);
     const [user_id, setUserId] = useLocalStorage<string | null>('user_id', null);
+
+    const tokenManager = {
+        getToken: () => {
+            return localStorage.getItem('token');
+        },
+        setToken: (token: string) => {
+            localStorage.setItem('token', token);
+        },
+        getRefreshToken: () => {
+            return localStorage.getItem('refresh_token');
+        },
+        setRefreshToken: (token: string) => {
+            localStorage.setItem('refresh_token', token);
+        }
+    }
 
     function send_handle(this: WebSocket, type: string, payload: object) {
         this.send(JSON.stringify({
@@ -20,6 +36,8 @@ function App() {
     }
 
     async function connect_websocket() {
+        await check_refresh_token();
+        const token = tokenManager.getToken();
         const auth_url = "http://localhost:3000/websocket-auth" + (token ? `?token=${token}` : "");
         const result = await fetch(auth_url, {
             headers: {Authorization: `Bearer ${token}`}
@@ -50,6 +68,35 @@ function App() {
         }
     }
 
+    async function check_refresh_token() {
+        if (!tokenManager.getRefreshToken()) {
+            console.log("ERROR: no refresh token found");
+            return;
+        }
+        const old_payload = jwtDecode(tokenManager.getToken() as string) as { exp: number };
+        const exp = old_payload.exp;
+        const now = Date.now() / 1000;
+        if (exp - now > 60) {
+            return;
+        }
+
+        const refresh_url = "http://localhost:3000/update-token";
+        const result = await fetch(refresh_url, {
+            headers: {Authorization: `Bearer ${tokenManager.getRefreshToken()}`}
+        })
+        const payload = await result.json();
+        console.log(payload);
+        if (!payload.token) {
+            console.log("ERROR: no token received from server");
+            return;
+        }
+        tokenManager.setToken(payload.token);
+        tokenManager.setRefreshToken(payload.refresh_token);
+        // setToken(payload.token);
+        // setRefreshToken(payload.refresh_token);
+
+    }
+
     function sendPING() {
         if (socket) {
             socket.send_handle("PING", {});
@@ -73,9 +120,11 @@ function App() {
 
         const {user_id, token, refresh_token} = payload;
         console.log(user_id, token, refresh_token);
+        tokenManager.setToken(token);
+        tokenManager.setRefreshToken(refresh_token);
         setUserId(user_id);
-        setToken(token);
-        setRefreshToken(refresh_token);
+        // setToken(token);
+        // setRefreshToken(refresh_token);
 
         const output = document.getElementById("test-output");
         if (!output) {
