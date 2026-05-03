@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react'
+import {useLocalStorage} from "usehooks-ts";
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -7,6 +8,9 @@ import './App.css'
 function App() {
     const [count, setCount] = useState(0)
     const [socket, setSocket] = useState< WebSocket & { send_handle: typeof send_handle } | null>(null)
+    const [token, setToken] = useLocalStorage<string | null>('token', null);
+    const [refresh_token, setRefreshToken] = useLocalStorage<string | null>('refresh_token', null);
+    const [user_id, setUserId] = useLocalStorage<string | null>('user_id', null);
 
     function send_handle(this: WebSocket, type: string, payload: object) {
         this.send(JSON.stringify({
@@ -15,8 +19,21 @@ function App() {
         }))
     }
 
-    useEffect(() => {
-        const ws_ = new WebSocket('ws://localhost:3000/websocket')
+    async function connect_websocket() {
+        const auth_url = "http://localhost:3000/websocket-auth" + (token ? `?token=${token}` : "");
+        const result = await fetch(auth_url, {
+            headers: {Authorization: `Bearer ${token}`}
+        });
+        const payload = await result.json();
+        console.log(payload);
+        const ticket = payload.ticket;
+        if (!ticket) {
+            console.log("ERROR: no ticket received from server");
+            return;
+        }
+
+
+        const ws_ = new WebSocket('ws://localhost:3000/websocket' + (ticket ? `?ticket=${ticket}` : ""))
         const ws = ws_ as WebSocket & { send_handle: typeof send_handle };
         ws.send_handle = send_handle;
 
@@ -31,8 +48,7 @@ function App() {
         ws.onclose = (event) => {
             console.log('Disconnected');
         }
-
-    }, [])
+    }
 
     function sendPING() {
         if (socket) {
@@ -54,6 +70,12 @@ function App() {
         const result = await fetch(url, {});
         const payload = await result.json();
         console.log(result);
+
+        const {user_id, token, refresh_token} = payload;
+        console.log(user_id, token, refresh_token);
+        setUserId(user_id);
+        setToken(token);
+        setRefreshToken(refresh_token);
 
         const output = document.getElementById("test-output");
         if (!output) {
@@ -88,6 +110,7 @@ function App() {
                 >
                     Count is {count}
                 </button>
+                <button type="button" className="counter" onClick={() => connect_websocket()}>Connect WebSocket</button>
                 <p id={'test-output'}></p>
             </section>
 
