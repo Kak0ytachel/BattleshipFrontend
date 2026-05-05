@@ -61,6 +61,12 @@ function App() {
 
         ws.onmessage = (event) => {
             console.log('Message from server:', event.data)
+            const test_output = document.getElementById("test-output");
+            if (!test_output) {
+                console.log("ERROR: unable to find #test-output")
+                return;
+            }
+            test_output.textContent = event.data;
         }
 
         ws.onclose = (event) => {
@@ -100,6 +106,20 @@ function App() {
     function sendPING() {
         if (socket) {
             socket.send_handle("PING", {});
+        }
+    }
+
+    function createGame() {
+        if (socket) {
+            socket.send_handle("CREATE-GAME", {});
+        }
+    }
+
+    function joinGame() {
+        if (socket) {
+            const element = document.getElementById("join-code");
+            const join_code = (element as HTMLInputElement).value;
+            socket.send_handle("JOIN-GAME", {join_code: join_code});
         }
     }
 
@@ -145,12 +165,9 @@ function App() {
                     <img src={viteLogo} className="vite" alt="Vite logo" />
                 </div>
                 <div>
-                    <h1>Get started</h1>
-                    <p>
-                        Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-                    </p>
+                    <h1>User id: #{user_id}</h1>
                 </div>
-                <input type="text" id="name_input"/>
+                <input type="text" id="name_input" placeholder="name"/>
                 <button
                     type="button"
                     className="counter"
@@ -160,7 +177,13 @@ function App() {
                     Count is {count}
                 </button>
                 <button type="button" className="counter" onClick={() => connect_websocket()}>Connect WebSocket</button>
-                <p id={'test-output'}></p>
+                <button type="button" className="counter" onClick={() => sendPING()}>Send PING</button>
+                    <p id={"test-output"}></p>
+                <button type="button" className="counter" onClick={() => createGame()}>Send START</button>
+                <input type="text" id="join-code" placeholder="join code"/>
+                <button type="button" className="counter" onClick={() => joinGame()}>Join game</button>
+                <p></p>
+
             </section>
 
             <div className="ticks"></div>
