@@ -28,6 +28,21 @@ function App() {
         }
     }
 
+    const events: Record<string, (websocket: WebSocket & {send_handle: typeof send_handle}, payload: object) => void> = {
+        PING: async (websocket, payload) => {
+            websocket.send_handle("PONG", {});
+        },
+        "JOIN-CODE": async (websocket, payload) => {
+            console.log('event fired');
+            const element: Element | null = document.getElementById("show-join-code");
+            if (!element) {
+                console.log("ERROR: unable to find #show-join-code");
+                return;
+            }
+            element.textContent = (payload as {join_code: string}).join_code;
+        }
+    }
+
     function send_handle(this: WebSocket, type: string, payload: object) {
         this.send(JSON.stringify({
             "type": type,
@@ -62,6 +77,12 @@ function App() {
         ws.onmessage = (event) => {
             console.log('Message from server:', event.data)
             const test_output = document.getElementById("test-output");
+            const data = JSON.parse(event.data);
+            const type = data.type;
+            const payload = data.payload;
+            if (type in events) {
+                events[type](ws, payload);
+            }
             if (!test_output) {
                 console.log("ERROR: unable to find #test-output")
                 return;
@@ -180,7 +201,8 @@ function App() {
                 <button type="button" className="counter" onClick={() => sendPING()}>Send PING</button>
                     <p id={"test-output"}></p>
                 <button type="button" className="counter" onClick={() => createGame()}>Send START</button>
-                <input type="text" id="join-code" placeholder="join code"/>
+                <p id="show-join-code"></p>
+                <input type="text" id="join-code" placeholder="enter join code"/>
                 <button type="button" className="counter" onClick={() => joinGame()}>Join game</button>
                 <p></p>
 
