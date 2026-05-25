@@ -1,14 +1,27 @@
 import {useEffect, useState} from 'react'
 import {useLocalStorage} from "usehooks-ts";
 import {jwtDecode} from "jwt-decode";
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { MemoryRouter, Routes, Route, Link, useNavigate } from 'react-router-dom'
 import './App.css'
+import TornCard from "./components/ui/TornCard.tsx";
+import TestPage from "./components/pages/TestPage.tsx";
+import HomePage from "./components/pages/HomePage.tsx";
+
+const Home = () => <TornCard>ac</TornCard>;
+const About = () => <h2>About Page</h2>;
+const Contact = () => <h2>Contact Page</h2>;
+
+function send_handle(this: WebSocket, type: string, payload: object) {
+    this.send(JSON.stringify({
+        "type": type,
+        "payload": payload,
+    }))
+}
+
+type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 
 function App() {
-    const [count, setCount] = useState(0)
-    const [socket, setSocket] = useState< WebSocket & { send_handle: typeof send_handle } | null>(null)
+    const [socket, setSocket] = useState< WebSocketPlus| null>(null)
     // const [token, setToken] = useLocalStorage<string | null>('token', null);
     // const [refresh_token, setRefreshToken] = useLocalStorage<string | null>('refresh_token', null);
     const [user_id, setUserId] = useLocalStorage<string | null>('user_id', null);
@@ -28,7 +41,7 @@ function App() {
         }
     }
 
-    const events: Record<string, (websocket: WebSocket & {send_handle: typeof send_handle}, payload: object) => void> = {
+    const events: Record<string, (websocket: WebSocketPlus, payload: object) => void> = {
         PING: async (websocket, payload) => {
             websocket.send_handle("PONG", {});
         },
@@ -43,12 +56,7 @@ function App() {
         }
     }
 
-    function send_handle(this: WebSocket, type: string, payload: object) {
-        this.send(JSON.stringify({
-            "type": type,
-            "payload": payload,
-        }))
-    }
+
 
     async function connect_websocket() {
         await check_refresh_token();
@@ -144,6 +152,12 @@ function App() {
         }
     }
 
+    async function getQuestions() {
+        if (socket) {
+            socket.send_handle("QUESTIONS-GET", {});
+        }
+    }
+
     async function createUser() {
         const element = document.getElementById("name_input");
         if (!element) {
@@ -177,124 +191,38 @@ function App() {
 
     }
 
+
+    // )
+
+    function Navigation() {
+        const navigate = useNavigate();
+
+        return (
+            <nav className="navbar">
+                {/* You can use standard Links */}
+                <Link to="/">Home</Link>
+                <Link to="/about">About</Link>
+                <Link to="/test">Test</Link>
+                <Link to="/home">home</Link>
+
+                {/* Or navigate programmatically via functions */}
+                <button onClick={() => navigate('/contact')}>Contact</button>
+            </nav>
+        );
+    }
     return (
-        <>
-            <section id="center">
-                <div className="hero">
-                    <img src={heroImg} className="base" width="170" height="179" alt="" />
-                    <img src={reactLogo} className="framework" alt="React logo" />
-                    <img src={viteLogo} className="vite" alt="Vite logo" />
-                </div>
-                <div>
-                    <h1>User id: #{user_id}</h1>
-                </div>
-                <input type="text" id="name_input" placeholder="name"/>
-                <button
-                    type="button"
-                    className="counter"
-                    // onClick={() => setCount((count) => count + 1)}
-                    onClick={() => createUser()}
-                >
-                    Count is {count}
-                </button>
-                <button type="button" className="counter" onClick={() => connect_websocket()}>Connect WebSocket</button>
-                <button type="button" className="counter" onClick={() => sendPING()}>Send PING</button>
-                    <p id={"test-output"}></p>
-                <button type="button" className="counter" onClick={() => createGame()}>Send START</button>
-                <p id="show-join-code"></p>
-                <input type="text" id="join-code" placeholder="enter join code"/>
-                <button type="button" className="counter" onClick={() => joinGame()}>Join game</button>
-                <p></p>
-
-            </section>
-
-            <div className="ticks"></div>
-
-            <section id="next-steps">
-                <div id="docs">
-                    <svg className="icon" role="presentation" aria-hidden="true">
-                        <use href="/icons.svg#documentation-icon"></use>
-                    </svg>
-                    <h2>Documentation</h2>
-                    <p>Your questions, answered</p>
-                    <ul>
-                        <li>
-                            <a href="https://vite.dev/" target="_blank">
-                                <img className="logo" src={viteLogo} alt="" />
-                                Explore Vite
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://react.dev/" target="_blank">
-                                <img className="button-icon" src={reactLogo} alt="" />
-                                Learn more
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div id="social">
-                    <svg className="icon" role="presentation" aria-hidden="true">
-                        <use href="/icons.svg#social-icon"></use>
-                    </svg>
-                    <h2>Connect with us</h2>
-                    <p>Join the Vite community</p>
-                    <ul>
-                        <li>
-                            <a href="https://github.com/vitejs/vite" target="_blank">
-                                <svg
-                                    className="button-icon"
-                                    role="presentation"
-                                    aria-hidden="true"
-                                >
-                                    <use href="/icons.svg#github-icon"></use>
-                                </svg>
-                                GitHub
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://chat.vite.dev/" target="_blank">
-                                <svg
-                                    className="button-icon"
-                                    role="presentation"
-                                    aria-hidden="true"
-                                >
-                                    <use href="/icons.svg#discord-icon"></use>
-                                </svg>
-                                Discord
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://x.com/vite_js" target="_blank">
-                                <svg
-                                    className="button-icon"
-                                    role="presentation"
-                                    aria-hidden="true"
-                                >
-                                    <use href="/icons.svg#x-icon"></use>
-                                </svg>
-                                X.com
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                                <svg
-                                    className="button-icon"
-                                    role="presentation"
-                                    aria-hidden="true"
-                                >
-                                    <use href="/icons.svg#bluesky-icon"></use>
-                                </svg>
-                                Bluesky
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </section>
-
-            <div className="ticks"></div>
-            <section id="spacer"></section>
-        </>
-    )
+        <MemoryRouter initialEntries={['/home']}>
+                <Navigation/>
+                    {/* The router handles all the "manual" switching automatically */}
+                <Routes>
+                    <Route path="/home" element={<HomePage />}/>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/test" element={<TestPage />}/>
+                </Routes>
+        </MemoryRouter>
+    );
 }
 
 export default App
