@@ -1,0 +1,48 @@
+.home-container {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.home-subcontainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    flex-grow: 1
+}
+
+.home-soon-helper {
+    position: relative;
+
+}
+
+.home-soon-container {
+    background-color: #869DBE;
+    border-radius: 8px;
+    rotate: -30deg;
+    position: absolute;
+    bottom: 20px;
+    right: -15px;
+}
+
+.home-soon {
+    color: white;
+    font-family: "Rowdies", sans-serif;
+    font-size: 28px;
+    font-weight: 500;
+    margin: 12px;
+    display: inline-block;
+}
+
+.home-disabled::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.5); /* 50% transparent gray */
+    /*pointer-events: none; !* Allows users to still click items underneath *!*/
+}
