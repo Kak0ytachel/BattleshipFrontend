@@ -13,10 +13,13 @@ export default function MultiplayerPage() {
     return (
         <>
             <div className="home-container">
-                <div className={"home-subcontainer"}>
+                <div className="back-helper">
                     <button className="back-button" onClick={() => navigate('/home')}>
                         <img  src={backIcon} alt="back" />
                     </button>
+                </div>
+                <div className={"home-subcontainer"}>
+
                     <h1 style={{marginBlock: "10px"}}> Wybierz przeciwnika</h1>
                     <button onClick={() => navigate('/contact')}>
                         <TornCard height={250} width={250}>

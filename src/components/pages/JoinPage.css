@@ -1,0 +1,21 @@
+.short-hr {
+    width: 200px;
+}
+
+.join-description {
+    white-space: pre-wrap;
+    font-family: "Rowdies", sans-serif;
+    font-weight: 300;
+}
+
+.join-subcontainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    flex-grow: 1;
+    padding-top: 100px;
+    padding-bottom: 300px;
+
+}

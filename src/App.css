@@ -55,11 +55,15 @@ button {
 }
 
 .back-button {
-  position: absolute;
+  position: relative;
   width: 32px;
   height: 32px;
   left: 40px;
   top: 40px;
+}
+
+.back-helper {
+  position: absolute;
 }
 
 /*.counter {*/
