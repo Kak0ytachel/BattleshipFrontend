@@ -27,7 +27,7 @@ export default function HomePage() {
 
                 </button>
 
-                <button onClick={() => navigate('/contact')}>
+                <button onClick={() => navigate('/multiplayer')}>
                     <TornCard height={250} width={250}>
                         <h3> Z przyjacielem</h3>
                         <img src={peopleIcon} alt="with-friend" />

@@ -6,6 +6,7 @@ import './App.css'
 import TornCard from "./components/ui/TornCard.tsx";
 import TestPage from "./components/pages/TestPage.tsx";
 import HomePage from "./components/pages/HomePage.tsx";
+import MultiplayerPage from "./components/pages/MultiplayerPage.tsx";
 
 const Home = () => <TornCard>ac</TornCard>;
 const About = () => <h2>About Page</h2>;
@@ -211,11 +212,12 @@ function App() {
         );
     }
     return (
-        <MemoryRouter initialEntries={['/home']}>
+        <MemoryRouter initialEntries={['/multiplayer']}>
                 <Navigation/>
                     {/* The router handles all the "manual" switching automatically */}
                 <Routes>
                     <Route path="/home" element={<HomePage />}/>
+                    <Route path="/multiplayer" element={<MultiplayerPage />}/>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
