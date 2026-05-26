@@ -1,4 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import ship1 from "/src/assets/ship1.svg";
+import ship2 from "/src/assets/ship2.svg";
+import ship2r from "/src/assets/ship2r.svg";
+import ship3 from "/src/assets/ship3.svg";
+import ship3r from "/src/assets/ship3r.svg";
 import "./GridDnd.css";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -28,17 +33,19 @@ export interface BlockCoords {
 
 const COLS = 6;
 const ROWS = 6;
-const CELL_SIZE = 80; // px
+const CELL_SIZE = 50; // px
 const GAP = 0;        // px
-const GRID_PAD = 12;  // px
+const GRID_PAD = -1;  // px
 
 const PALETTE: Block[] = [
-    { id: "a", label: "1×2", w: 1, h: 2, color: "#6366f1" },
-    { id: "b", label: "2×1", w: 2, h: 1, color: "#ec4899" },
-    { id: "c", label: "2×3", w: 2, h: 3, color: "#f59e0b" },
-    { id: "d", label: "3×2", w: 3, h: 2, color: "#10b981" },
-    { id: "e", label: "1×1", w: 1, h: 1, color: "#3b82f6" },
-    { id: "f", label: "3×3", w: 3, h: 3, color: "#ef4444" },
+    { id: "a", label: "1×3", w: 3, h: 1, color: "rgba(59 130 246 / 0.4)" },
+    { id: "b", label: "1×2", w: 2, h: 1, color: "rgba(59 130 246 / 0.4)" },
+    { id: "c", label: "2×1", w: 2, h: 1, color: "rgba(59 130 246 / 0.4)" },
+    // { id: "d", label: "3×1", w: 3, h: 1, color: "#10b981" },
+    { id: "d", label: "1×1", w: 1, h: 1, color: "rgba(59 130 246 / 0.4)" },
+    { id: "e", label: "1×1", w: 1, h: 1, color: "rgba(59 130 246 / 0.4)" },
+    { id: "f", label: "1×1", w: 1, h: 1, color: "rgba(59 130 246 / 0.4)" },
+    // { id: "f", label: "3×3", w: 3, h: 3, color: "#ef4444" },
 ];
 
 // ─── Textures ─────────────────────────────────────────────────────────────────
@@ -46,70 +53,33 @@ const PALETTE: Block[] = [
 // Each motif is designed at 40×40 and tiled via background-repeat.
 
 const TEXTURES: Record<string, string> = (() => {
-    const colors: Record<string, string> = {
-        a: "#6366f1", b: "#ec4899", c: "#f59e0b",
-        d: "#10b981", e: "#3b82f6", f: "#ef4444",
-    };
+    // const colors: Record<string, string> = {
+    //     a: "#f59e0b", b: "#6366f1", c: "#ec4899",
+    //     d: "#3b82f6", e: "#ef4444", f: "#10b981",
+    // };
 
-    const svgs: Record<string, (c: string) => string> = {
-        // Indigo · circuit traces with solder pads
-        a: (c) => `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
-      <path d='M0 10 H15 V30 H40' stroke='${c}' stroke-width='1.2' stroke-opacity='0.35' fill='none'/>
-      <path d='M0 30 H10 V10 H40' stroke='${c}' stroke-width='1.2' stroke-opacity='0.25' fill='none'/>
-      <circle cx='15' cy='10' r='2.5' fill='${c}' fill-opacity='0.4'/>
-      <circle cx='10' cy='30' r='2.5' fill='${c}' fill-opacity='0.4'/>
-    </svg>`,
-
-        // Pink · sine waves
-        b: (c) => `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
-      <path d='M0 20 C5 10,15 10,20 20 S35 30,40 20' stroke='${c}' stroke-width='1.5' stroke-opacity='0.4' fill='none'/>
-      <path d='M0 28 C5 18,15 18,20 28 S35 38,40 28' stroke='${c}' stroke-width='1' stroke-opacity='0.2' fill='none'/>
-      <path d='M0 12 C5 2,15 2,20 12 S35 22,40 12' stroke='${c}' stroke-width='1' stroke-opacity='0.2' fill='none'/>
-    </svg>`,
-
-        // Amber · honeycomb
-        c: (c) => `<svg xmlns='http://www.w3.org/2000/svg' width='34' height='40'>
-      <polygon points='17,2 30,9.5 30,24.5 17,32 4,24.5 4,9.5' stroke='${c}' stroke-width='1.2' stroke-opacity='0.35' fill='none'/>
-      <polygon points='17,10 24,14 24,22 17,26 10,22 10,14' stroke='${c}' stroke-width='1' stroke-opacity='0.2' fill='none'/>
-      <circle cx='17' cy='18' r='2' fill='${c}' fill-opacity='0.35'/>
-    </svg>`,
-
-        // Emerald · crosshair grid
-        d: (c) => `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
-      <line x1='12' y1='4' x2='12' y2='20' stroke='${c}' stroke-width='1.2' stroke-opacity='0.3'/>
-      <line x1='4' y1='12' x2='20' y2='12' stroke='${c}' stroke-width='1.2' stroke-opacity='0.3'/>
-      <circle cx='12' cy='12' r='1.5' fill='${c}' fill-opacity='0.45'/>
-      <circle cx='4' cy='4' r='1' fill='${c}' fill-opacity='0.25'/>
-      <circle cx='20' cy='4' r='1' fill='${c}' fill-opacity='0.25'/>
-      <circle cx='4' cy='20' r='1' fill='${c}' fill-opacity='0.25'/>
-      <circle cx='20' cy='20' r='1' fill='${c}' fill-opacity='0.25'/>
-    </svg>`,
-
-        // Blue · concentric rings (target / radar)
-        e: (c) => `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
-      <circle cx='20' cy='20' r='16' stroke='${c}' stroke-width='1'   stroke-opacity='0.25' fill='none'/>
-      <circle cx='20' cy='20' r='10' stroke='${c}' stroke-width='1.2' stroke-opacity='0.35' fill='none'/>
-      <circle cx='20' cy='20' r='4'  stroke='${c}' stroke-width='1.5' stroke-opacity='0.45' fill='none'/>
-      <circle cx='20' cy='20' r='1.5' fill='${c}' fill-opacity='0.6'/>
-    </svg>`,
-
-        // Red · triangular mesh
-        f: (c) => `<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
-      <polygon points='20,4 36,32 4,32' stroke='${c}' stroke-width='1.2' stroke-opacity='0.3' fill='none'/>
-      <polygon points='20,14 30,32 10,32' stroke='${c}' stroke-width='1' stroke-opacity='0.22' fill='none'/>
-      <line x1='20' y1='4' x2='20' y2='32' stroke='${c}' stroke-width='0.8' stroke-opacity='0.2'/>
-      <line x1='4' y1='32' x2='36' y2='32' stroke='${c}' stroke-width='0.8' stroke-opacity='0.2'/>
-      <circle cx='20' cy='4'  r='2' fill='${c}' fill-opacity='0.4'/>
-      <circle cx='4'  cy='32' r='2' fill='${c}' fill-opacity='0.4'/>
-      <circle cx='36' cy='32' r='2' fill='${c}' fill-opacity='0.4'/>
-    </svg>`,
+    const svgs: Record<string, string> = {
+        a: ship3,
+        ar: ship3r,
+        br: ship2r,
+        b: ship2,
+        cr: ship2r,
+        c: ship2,
+        d: ship1,
+        e: ship1,
+        f: ship1
     };
 
     return Object.fromEntries(
-        Object.entries(svgs).map(([id, fn]) => [
-            id,
-            `url("data:image/svg+xml,${encodeURIComponent(fn(colors[id]))}")`,
-        ])
+        Object.entries(svgs).map(([id, fn]) => {
+
+            // const backgroundValue = ;
+                // result.trim().startsWith("<svg")
+                // ? `url("data:image/svg+xml,${encodeURIComponent(result)}")`
+                // :
+
+            return [id, `url("${fn}")`];
+        })
     );
 })();
 
@@ -188,7 +158,7 @@ function BlockFace({
         width: pw,
         height: ph,
         "--block-color": block.color,
-        backgroundImage: onGrid ? undefined : TEXTURES[block.id],
+        backgroundImage: onGrid ? undefined : TEXTURES[block.id + (rotated ? "r" : "") ],
     } as React.CSSProperties;
 
     if (isPlaced) {
@@ -196,11 +166,11 @@ function BlockFace({
         style.top  = placedTop;
     }
 
-    const labelText = onGrid
-        ? "···"
-        : rotated && block.w !== block.h
-            ? `${block.h}×${block.w}↺`
-            : block.label;
+    // const labelText = onGrid
+    //     ? "···"
+    //     : rotated && block.w !== block.h
+    //         ? `${block.h}×${block.w}↺`
+    //         : block.label;
 
     return (
         <div
@@ -212,7 +182,7 @@ function BlockFace({
             onDragEnd={onDragEnd}
             onDoubleClick={onDoubleClick}
         >
-            <span className="block-face__label">{labelText}</span>
+            {/*<span className="block-face__label">{labelText}</span>*/}
             {!onGrid && block.w !== block.h && !rotated && (
                 <span className="block-face__rotate-hint">↺</span>
             )}
@@ -222,50 +192,50 @@ function BlockFace({
 
 // ─── ResultPanel ──────────────────────────────────────────────────────────────
 
-function ResultPanel({ results, width }: { results: BlockCoords[]; width: number }) {
-    return (
-        <div className="result-panel" style={{ width }}>
-            <div className="result-panel__heading">
-                <span className="result-panel__heading-icon">✓</span>
-                ALL BLOCKS PLACED
-            </div>
-            <div className="result-panel__rows">
-                {results.map((r, i) => (
-                    <div
-                        key={r.blockId}
-                        className="result-panel__row"
-                        style={{ animationDelay: `${i * 0.06}s` }}
-                    >
-                        <div
-                            className="result-panel__swatch"
-                            style={{
-                                background: r.color,
-                                boxShadow: `0 0 8px ${r.color}88`,
-                            }}
-                        />
-                        <span className="result-panel__block-label">{r.label}</span>
-                        <div className="result-panel__cells">
-                            {r.cells.map((cell, ci) => (
-                                <span
-                                    key={cell}
-                                    className="result-panel__cell-badge"
-                                    style={{
-                                        color: r.color,
-                                        background: `${r.color}22`,
-                                        border: `1px solid ${r.color}55`,
-                                        animationDelay: `${i * 0.06 + ci * 0.03}s`,
-                                    }}
-                                >
-                  {cell}
-                </span>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
+// function ResultPanel({ results, width }: { results: BlockCoords[]; width: number }) {
+//     return (
+//         <div className="result-panel" style={{ width }}>
+//             <div className="result-panel__heading">
+//                 <span className="result-panel__heading-icon">✓</span>
+//                 ALL BLOCKS PLACED
+//             </div>
+//             <div className="result-panel__rows">
+//                 {results.map((r, i) => (
+//                     <div
+//                         key={r.blockId}
+//                         className="result-panel__row"
+//                         style={{ animationDelay: `${i * 0.06}s` }}
+//                     >
+//                         <div
+//                             className="result-panel__swatch"
+//                             style={{
+//                                 background: r.color,
+//                                 boxShadow: `0 0 8px ${r.color}88`,
+//                             }}
+//                         />
+//                         <span className="result-panel__block-label">{r.label}</span>
+//                         <div className="result-panel__cells">
+//                             {r.cells.map((cell, ci) => (
+//                                 <span
+//                                     key={cell}
+//                                     className="result-panel__cell-badge"
+//                                     style={{
+//                                         color: r.color,
+//                                         background: `${r.color}22`,
+//                                         border: `1px solid ${r.color}55`,
+//                                         animationDelay: `${i * 0.06 + ci * 0.03}s`,
+//                                     }}
+//                                 >
+//                   {cell}
+//                 </span>
+//                             ))}
+//                         </div>
+//                     </div>
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// }
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -435,37 +405,18 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
     }
 
     // ── Pixel geometry ──
-    const gridContentWidth = COLS * CELL_SIZE + (COLS - 1) * GAP;
-    const resultPanelWidth = gridContentWidth + GRID_PAD * 2;
+    // const gridContentWidth = COLS * CELL_SIZE + (COLS - 1) * GAP;
+    // const resultPanelWidth = gridContentWidth + GRID_PAD * 2;
 
     return (
         <div className="grid-app">
             {/* Header */}
-            <div className="grid-app__title">
-                <h1>GRID LAYOUT</h1>
-                <p>click to rotate · drag to place · double-click placed block to remove</p>
-            </div>
+            {/*<div className="grid-app__title">*/}
+                {/*<h1>GRID LAYOUT</h1>*/}
+                {/*<p>click to rotate · drag to place · double-click placed block to remove</p>*/}
+            {/*</div>*/}
 
-            {/* Palette */}
-            <div className="palette">
-                {PALETTE.map((block) => {
-                    const onGrid  = placedIds.has(block.id);
-                    const rotated = !!(rotations[block.id]);
-                    const { w: ew, h: eh } = effectiveWH(block, block.id);
-                    const { width, height } = blockPx(ew, eh);
-                    return (
-                        <BlockFace
-                            key={block.id}
-                            block={block} rotated={rotated}
-                            pw={width} ph={height}
-                            onGrid={onGrid}
-                            draggable={!onGrid}
-                            onClick={!onGrid ? () => toggleRotation(block.id) : undefined}
-                            onDragStart={!onGrid ? (e) => onPaletteDragStart(e, block) : undefined}
-                        />
-                    );
-                })}
-            </div>
+
 
             {/* Grid + axis labels */}
             <div className="grid-wrapper">
@@ -556,8 +507,29 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
                 </div>
             </div>
 
+            {/* Palette */}
+            <div className="palette">
+                {PALETTE.map((block) => {
+                    const onGrid  = placedIds.has(block.id);
+                    const rotated = !!(rotations[block.id]);
+                    const { w: ew, h: eh } = effectiveWH(block, block.id);
+                    const { width, height } = blockPx(ew, eh);
+                    return (
+                        <BlockFace
+                            key={block.id}
+                            block={block} rotated={rotated}
+                            pw={width} ph={height}
+                            onGrid={onGrid}
+                            draggable={!onGrid}
+                            onClick={!onGrid ? () => toggleRotation(block.id) : undefined}
+                            onDragStart={!onGrid ? (e) => onPaletteDragStart(e, block) : undefined}
+                        />
+                    );
+                })}
+            </div>
+
             {/* Result panel */}
-            {result && <ResultPanel results={result} width={resultPanelWidth} />}
+            {/*{result && <ResultPanel results={result} width={resultPanelWidth} />}*/}
         </div>
     );
 }

@@ -1,7 +1,7 @@
 /* ─── Reset / Base ─────────────────────────────────────────────────────────── */
 
 .grid-app {
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     /*background: #0f1117;*/
     background-color: white;
     display: flex;
@@ -61,7 +61,8 @@
     /* color and border-color set via --block-color inline */
     border-color: var(--block-color);
     background-color: color-mix(in srgb, var(--block-color) 73%, transparent);
-    background-size: cover;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     background-position: center;
 }
 
@@ -131,7 +132,7 @@
 
 .grid-col-label {
     text-align: center;
-    font-size: 10px;
+    font-size: 18px;
     /*color: rgba(255, 255, 255, 0.2);*/
     color: var(--text-color);
     letter-spacing: 0.08em;
@@ -154,7 +155,7 @@
 .grid-row-label {
     display: flex;
     align-items: center;
-    font-size: 10px;
+    font-size: 18px;
     /*color: rgba(255, 255, 255, 0.2);*/
     letter-spacing: 0.08em;
     font-weight: 600;
@@ -168,8 +169,9 @@
     position: relative;
     /*background: rgba(255, 255, 255, 0.02);*/
     /*background: #A6D9EA ;*/
-    /*border: 10px solid #a1c4fd;*/
-    border-radius: 12px;
+    border: 3px solid #A6D9EA;
+    padding: 0;
+    /*border-radius: 12px;*/
     /* grid-template-columns/rows, gap, padding set inline (depend on CELL_SIZE constant) */
 }
 
@@ -180,7 +182,7 @@
     background: rgba(255, 255, 255, 0.04);
     /*border: 1px solid rgba(255, 255, 255, 0.08);*/
     /*border: 2px solid #A6D9EA;*/
-    border: 10px solid #a1c4fd;
+    border: 3px solid #A6D9EA;
     transition: background 0.15s, border-color 0.15s;
     background: white;
 }
@@ -217,81 +219,81 @@
 
 /* ─── Result panel ──────────────────────────────────────────────────────────── */
 
-@keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+/*@keyframes fadeSlideIn {*/
+/*    from { opacity: 0; transform: translateY(12px); }*/
+/*    to   { opacity: 1; transform: translateY(0); }*/
+/*}*/
 
-@keyframes popIn {
-    0%   { opacity: 0; transform: scale(0.7); }
-    60%  { transform: scale(1.15); }
-    100% { opacity: 1; transform: scale(1); }
-}
+/*@keyframes popIn {*/
+/*    0%   { opacity: 0; transform: scale(0.7); }*/
+/*    60%  { transform: scale(1.15); }*/
+/*    100% { opacity: 1; transform: scale(1); }*/
+/*}*/
 
-.result-panel {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 18px 20px;
-    animation: fadeSlideIn 0.4s ease both;
-}
+/*.result-panel {*/
+/*    background: rgba(255, 255, 255, 0.03);*/
+/*    border: 1px solid rgba(255, 255, 255, 0.1);*/
+/*    border-radius: 12px;*/
+/*    padding: 18px 20px;*/
+/*    animation: fadeSlideIn 0.4s ease both;*/
+/*}*/
 
-.result-panel__heading {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #10b981;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+/*.result-panel__heading {*/
+/*    font-size: 11px;*/
+/*    font-weight: 700;*/
+/*    letter-spacing: 0.12em;*/
+/*    color: #10b981;*/
+/*    margin-bottom: 14px;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    gap: 8px;*/
+/*}*/
 
-.result-panel__heading-icon {
-    font-size: 16px;
-}
+/*.result-panel__heading-icon {*/
+/*    font-size: 16px;*/
+/*}*/
 
-.result-panel__rows {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+/*.result-panel__rows {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 10px;*/
+/*}*/
 
-.result-panel__row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    animation: fadeSlideIn 0.3s ease both;
-}
+/*.result-panel__row {*/
+/*    display: flex;*/
+/*    align-items: flex-start;*/
+/*    gap: 10px;*/
+/*    animation: fadeSlideIn 0.3s ease both;*/
+/*}*/
 
-.result-panel__swatch {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    flex-shrink: 0;
-    margin-top: 2px;
-    /* background + box-shadow set inline via --block-color */
-}
+/*.result-panel__swatch {*/
+/*    width: 10px;*/
+/*    height: 10px;*/
+/*    border-radius: 2px;*/
+/*    flex-shrink: 0;*/
+/*    margin-top: 2px;*/
+/*    !* background + box-shadow set inline via --block-color *!*/
+/*}*/
 
-.result-panel__block-label {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.45);
-    letter-spacing: 0.06em;
-    min-width: 36px;
-}
+/*.result-panel__block-label {*/
+/*    font-size: 10px;*/
+/*    color: rgba(255, 255, 255, 0.45);*/
+/*    letter-spacing: 0.06em;*/
+/*    min-width: 36px;*/
+/*}*/
 
-.result-panel__cells {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
+/*.result-panel__cells {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    gap: 5px;*/
+/*}*/
 
-.result-panel__cell-badge {
-    font-size: 11px;
-    font-weight: 700;
-    border-radius: 4px;
-    padding: 1px 6px;
-    letter-spacing: 0.06em;
-    animation: popIn 0.25s ease both;
-    /* color, background, border set inline via --block-color */
-}
+/*.result-panel__cell-badge {*/
+/*    font-size: 11px;*/
+/*    font-weight: 700;*/
+/*    border-radius: 4px;*/
+/*    padding: 1px 6px;*/
+/*    letter-spacing: 0.06em;*/
+/*    animation: popIn 0.25s ease both;*/
+/*    !* color, background, border set inline via --block-color *!*/
+/*}*/
