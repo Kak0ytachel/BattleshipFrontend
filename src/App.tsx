@@ -10,6 +10,9 @@ import MultiplayerPage from "./components/pages/MultiplayerPage.tsx";
 import OtpInput from "/src/components/ui/OtpInput.tsx";
 import JoinPage from "./components/pages/JoinPage.tsx";
 import CreatePage from "./components/pages/CreatePage.tsx";
+import PlacePage from "./components/pages/PlacePage.tsx";
+import WaitPage from "./components/pages/WaitPage.tsx";
+import NamePage from "./components/pages/NamePage.tsx";
 
 const Home = () => <TornCard>ac</TornCard>;
 const About = () => <h2>About Page</h2>;
@@ -210,6 +213,9 @@ function App() {
                 <Link to="/home">home</Link>
                 <Link to="/join">Join</Link>
                 <Link to="/create">Create</Link>
+                <Link to="/place">Place</Link>
+                <Link to="/wait">Wait</Link>
+                <Link to="/name">Name</Link>
 
                 {/* Or navigate programmatically via functions */}
                 <button onClick={() => navigate('/contact')}>Contact</button>
@@ -229,6 +235,9 @@ function App() {
                     <Route path="/test" element={<TestPage />} />
                     <Route path="/join" element={<JoinPage />} />
                     <Route path="/create" element={<CreatePage />} />
+                    <Route path="/place" element={<PlacePage />} />
+                    <Route path="/wait" element={<WaitPage />} />
+                    <Route path="/name" element={<NamePage/>} />
                 </Routes>
         </MemoryRouter>
     );

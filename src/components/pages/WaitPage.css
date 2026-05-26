@@ -1,0 +1,13 @@
+.wait-icon {
+    margin-inline: 80px;
+}
+
+.wait-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: space-evenly;
+    padding-top: 100px;
+    padding-bottom: 200px;
+}
