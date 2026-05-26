@@ -14,7 +14,7 @@ export default function JoinPage() {
         <>
             <div className="home-container">
                 <div className="back-helper">
-                    <button className="back-button" onClick={() => navigate('/home')}>
+                    <button className="back-button" onClick={() => navigate('/multiplayer')}>
                         <img  src={backIcon} alt="back" />
                     </button>
                 </div>

@@ -21,7 +21,7 @@ export default function MultiplayerPage() {
                 <div className={"home-subcontainer"}>
 
                     <h1 style={{marginBlock: "10px"}}> Wybierz przeciwnika</h1>
-                    <button onClick={() => navigate('/contact')}>
+                    <button onClick={() => navigate('/create')}>
                         <TornCard height={250} width={250}>
                             <h3> Stwórz grę</h3>
                             <h5>Utwórz link i zaproś przyjaciela</h5>
@@ -35,7 +35,7 @@ export default function MultiplayerPage() {
 
                     </button>
 
-                    <button onClick={() => navigate('/contact')}>
+                    <button onClick={() => navigate('/join')}>
                         <TornCard height={250} width={250}>
                             <h3> Dołącz do gry</h3>
                             <h5>Wklej link od przyjaciela</h5>

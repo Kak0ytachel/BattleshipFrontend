@@ -9,6 +9,7 @@ import HomePage from "./components/pages/HomePage.tsx";
 import MultiplayerPage from "./components/pages/MultiplayerPage.tsx";
 import OtpInput from "/src/components/ui/OtpInput.tsx";
 import JoinPage from "./components/pages/JoinPage.tsx";
+import CreatePage from "./components/pages/CreatePage.tsx";
 
 const Home = () => <TornCard>ac</TornCard>;
 const About = () => <h2>About Page</h2>;
@@ -208,6 +209,7 @@ function App() {
                 <Link to="/test">Test</Link>
                 <Link to="/home">home</Link>
                 <Link to="/join">Join</Link>
+                <Link to="/create">Create</Link>
 
                 {/* Or navigate programmatically via functions */}
                 <button onClick={() => navigate('/contact')}>Contact</button>
@@ -226,6 +228,7 @@ function App() {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/test" element={<TestPage />} />
                     <Route path="/join" element={<JoinPage />} />
+                    <Route path="/create" element={<CreatePage />} />
                 </Routes>
         </MemoryRouter>
     );
