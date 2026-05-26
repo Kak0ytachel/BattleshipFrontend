@@ -1,0 +1,297 @@
+/* ─── Reset / Base ─────────────────────────────────────────────────────────── */
+
+.grid-app {
+    min-height: 100vh;
+    /*background: #0f1117;*/
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    font-family: "Rowdies", sans-serif;
+    color: #e2e8f0;
+    gap: 24px;
+}
+
+/* ─── Header ────────────────────────────────────────────────────────────────── */
+
+.grid-app__title {
+    text-align: center;
+}
+
+.grid-app__title h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin: 0;
+    color: #f8fafc;
+}
+
+.grid-app__title p {
+    font-size: 12px;
+    color: #64748b;
+    margin: 6px 0 0;
+    letter-spacing: 0.05em;
+}
+
+/* ─── Palette ───────────────────────────────────────────────────────────────── */
+
+.palette {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ─── Block face ────────────────────────────────────────────────────────────── */
+
+.block-face {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border-width: 2px;
+    border-style: solid;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    cursor: grab;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    /* color and border-color set via --block-color inline */
+    border-color: var(--block-color);
+    background-color: color-mix(in srgb, var(--block-color) 73%, transparent);
+    background-size: cover;
+    background-position: center;
+}
+
+.block-face:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--block-color) 40%, transparent);
+}
+
+.block-face--on-grid {
+    cursor: not-allowed;
+    opacity: 0.4;
+    background-color: rgba(255, 255, 255, 0.04);
+    background-image: none !important;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.block-face--on-grid:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.block-face--placed {
+    position: absolute;
+    z-index: 5;
+    cursor: grab;
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--block-color) 27%, transparent);
+}
+
+.block-face__label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    position: relative;
+    z-index: 1;
+}
+
+.block-face--on-grid .block-face__label {
+    color: rgba(255, 255, 255, 0.2);
+    text-shadow: none;
+}
+
+.block-face__rotate-hint {
+    position: absolute;
+    bottom: 4px;
+    right: 6px;
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+}
+
+/* ─── Grid wrapper (axis labels + grid) ─────────────────────────────────────── */
+
+.grid-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.grid-col-labels {
+    display: flex;
+    margin-bottom: 4px;
+    /* paddingLeft set inline to align with grid content */
+}
+
+.grid-col-label {
+    text-align: center;
+    font-size: 10px;
+    /*color: rgba(255, 255, 255, 0.2);*/
+    color: var(--text-color);
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+.grid-row-and-board {
+    display: flex;
+    gap: 0;
+}
+
+.grid-row-labels {
+    display: flex;
+    flex-direction: column;
+    margin-right: 6px;
+    width: 14px;
+    /* gap, paddingTop/Bottom set inline to match grid cell size */
+}
+
+.grid-row-label {
+    display: flex;
+    align-items: center;
+    font-size: 10px;
+    /*color: rgba(255, 255, 255, 0.2);*/
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* ─── Grid board ────────────────────────────────────────────────────────────── */
+
+.grid-board {
+    display: grid;
+    position: relative;
+    /*background: rgba(255, 255, 255, 0.02);*/
+    /*background: #A6D9EA ;*/
+    /*border: 10px solid #a1c4fd;*/
+    border-radius: 12px;
+    /* grid-template-columns/rows, gap, padding set inline (depend on CELL_SIZE constant) */
+}
+
+/* ─── Grid cells ────────────────────────────────────────────────────────────── */
+
+.cell {
+    /*border-radius: 6px;*/
+    background: rgba(255, 255, 255, 0.04);
+    /*border: 1px solid rgba(255, 255, 255, 0.08);*/
+    /*border: 2px solid #A6D9EA;*/
+    border: 10px solid #a1c4fd;
+    transition: background 0.15s, border-color 0.15s;
+    background: white;
+}
+
+.cell--halo {
+    background: rgba(239, 68, 68, 0.10);
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.cell--occupied {
+    background: transparent;
+    border-color: transparent;
+}
+
+/* ─── Drop ghost ────────────────────────────────────────────────────────────── */
+
+.drop-ghost {
+    position: absolute;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 10;
+    transition: left 0.04s, top 0.04s;
+}
+
+.drop-ghost--valid {
+    background: rgba(99, 102, 241, 0.25);
+    border: 2px dashed #6366f1;
+}
+
+.drop-ghost--invalid {
+    background: rgba(239, 68, 68, 0.25);
+    border: 2px dashed #ef4444;
+}
+
+/* ─── Result panel ──────────────────────────────────────────────────────────── */
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+    0%   { opacity: 0; transform: scale(0.7); }
+    60%  { transform: scale(1.15); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.result-panel {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 18px 20px;
+    animation: fadeSlideIn 0.4s ease both;
+}
+
+.result-panel__heading {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #10b981;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.result-panel__heading-icon {
+    font-size: 16px;
+}
+
+.result-panel__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.result-panel__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    animation: fadeSlideIn 0.3s ease both;
+}
+
+.result-panel__swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    /* background + box-shadow set inline via --block-color */
+}
+
+.result-panel__block-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.06em;
+    min-width: 36px;
+}
+
+.result-panel__cells {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.result-panel__cell-badge {
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 6px;
+    letter-spacing: 0.06em;
+    animation: popIn 0.25s ease both;
+    /* color, background, border set inline via --block-color */
+}
