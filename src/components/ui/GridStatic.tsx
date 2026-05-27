@@ -140,7 +140,7 @@ function BlockFace({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function DragDropGrid({gridData = {}, active = true, bombing = false}:
+export default function GridStatic({gridData = {}, active = true, bombing = false}:
     {gridData: Record<string, Record<string, boolean>>, active: boolean, bombing: boolean}) {
 
 
@@ -280,7 +280,7 @@ export default function DragDropGrid({gridData = {}, active = true, bombing = fa
     console.log(bombing)
 
     return (
-        <div className="grid-app">
+        <div className="grid-app-static">
 
             {/* Grid + axis labels */}
             <div className="grid-wrapper">
