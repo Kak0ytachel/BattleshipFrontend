@@ -140,7 +140,8 @@ function BlockFace({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function DragDropGrid({gridData = {}}: {gridData: Record<string, Record<string, boolean>>}) {
+export default function DragDropGrid({gridData = {}, active = true, bombing = false}:
+    {gridData: Record<string, Record<string, boolean>>, active: boolean, bombing: boolean}) {
 
 
     function cellLabel(col: number, row: number): string {
@@ -149,8 +150,7 @@ export default function DragDropGrid({gridData = {}}: {gridData: Record<string, 
 
     // ─── initial state ─────────
 
-
-
+    // TODO: расположение кораблей из json'a
 
 
 
@@ -187,7 +187,7 @@ export default function DragDropGrid({gridData = {}}: {gridData: Record<string, 
         return { col, row, w, h, valid};
     }, [placed, cursorInGrid]);
 
-    const onMouseMove = (e: React.DragEvent) => {
+    const onMouseMove = (e: React.MouseEvent) => {
         e.preventDefault();
         const t = computeTarget(e);
         if (!t) return;
@@ -277,6 +277,7 @@ export default function DragDropGrid({gridData = {}}: {gridData: Record<string, 
             );
         }
     }
+    console.log(bombing)
 
     return (
         <div className="grid-app">
@@ -320,8 +321,8 @@ export default function DragDropGrid({gridData = {}}: {gridData: Record<string, 
                         ref={gridRef}
                         className="grid-board"
                         // onMouseOver={onMouseOver}
-                        onMouseMove={onMouseMove}
-                        onMouseLeave={onMouseLeave}
+                        onMouseMove={active? onMouseMove : () => {}}
+                        onMouseLeave={active? onMouseLeave: () => {}}
                         // onDragLeave={onGridDragLeave}
                         // onDrop={onGridDrop}
                         style={{
@@ -349,7 +350,7 @@ export default function DragDropGrid({gridData = {}}: {gridData: Record<string, 
                         {/* Drop ghost */}
                         {ghost && (
                             <div
-                                className={`drop-ghost-static ${ghost.valid ? "drop-ghost-static--valid" : "drop-ghost-static--invalid"}`}
+                                className={`drop-ghost-static ${ghost.valid ? "drop-ghost-static--valid" : "drop-ghost-static--invalid"} ${bombing? "drop-ghost-static-bomb": "drop-ghost-static-sight" }`}
                                 style={{
                                     left:   ghost.col * (CELL_SIZE + GAP) + GRID_PAD,
                                     top:    ghost.row * (CELL_SIZE + GAP) + GRID_PAD,
@@ -382,22 +383,22 @@ export default function DragDropGrid({gridData = {}}: {gridData: Record<string, 
             </div>
 
             {/* Palette */}
-            <div className="palette">
-                {PALETTE.map((block) => {
-                    const onGrid  = placedIds.has(block.id);
-                    const rotated = false;
-                    const { w: ew, h: eh } = effectiveWH(block, block.id);
-                    const { width, height } = blockPx(ew, eh);
-                    return (
-                        <BlockFace
-                            key={block.id}
-                            block={block} rotated={rotated}
-                            pw={width} ph={height}
-                            onGrid={onGrid}
-                        />
-                    );
-                })}
-            </div>
+            {/*<div className="palette">*/}
+            {/*    {PALETTE.map((block) => {*/}
+            {/*        const onGrid  = placedIds.has(block.id);*/}
+            {/*        const rotated = false;*/}
+            {/*        const { w: ew, h: eh } = effectiveWH(block, block.id);*/}
+            {/*        const { width, height } = blockPx(ew, eh);*/}
+            {/*        return (*/}
+            {/*            <BlockFace*/}
+            {/*                key={block.id}*/}
+            {/*                block={block} rotated={rotated}*/}
+            {/*                pw={width} ph={height}*/}
+            {/*                onGrid={onGrid}*/}
+            {/*            />*/}
+            {/*        );*/}
+            {/*    })}*/}
+            {/*</div>*/}
 
             {/* Result panel */}
             {/*{result && <ResultPanel results={result} width={resultPanelWidth} />}*/}

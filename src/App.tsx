@@ -7,16 +7,18 @@ import TornCard from "./components/ui/TornCard.tsx";
 import TestPage from "./components/pages/TestPage.tsx";
 import HomePage from "./components/pages/HomePage.tsx";
 import MultiplayerPage from "./components/pages/MultiplayerPage.tsx";
-import OtpInput from "/src/components/ui/OtpInput.tsx";
+// import OtpInput from "./components/ui/OtpInput.tsx";
 import JoinPage from "./components/pages/JoinPage.tsx";
 import CreatePage from "./components/pages/CreatePage.tsx";
 import PlacePage from "./components/pages/PlacePage.tsx";
 import WaitPage from "./components/pages/WaitPage.tsx";
 import NamePage from "./components/pages/NamePage.tsx";
+import GridStatic from "./components/ui/GridStatic.tsx";
+import TestComponent from "./components/ui/TestComponent.tsx";
 
-const Home = () => <TornCard>ac</TornCard>;
+const Home = () => <TestComponent/>;
 const About = () => <h2>About Page</h2>;
-const Contact = () => <OtpInput/>;
+const Contact = () => <GridStatic/>;
 
 function send_handle(this: WebSocket, type: string, payload: object) {
     this.send(JSON.stringify({

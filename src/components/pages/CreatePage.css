@@ -37,6 +37,7 @@
     flex-direction: column;
     flex-grow: 1;
     justify-content: space-around;
+    max-height: 200px;
 }
 
 .create-link-copied-container {
