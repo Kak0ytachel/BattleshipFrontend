@@ -30,7 +30,7 @@
     right: 0;
     bottom: 0;
     background-color: #ffffff;
-    border: 12px solid var(--marine-color);
+    border: 8px solid var(--marine-color);
     z-index: -1;
     pointer-events: none; /* Ensures it doesn't block text/button selections */
 

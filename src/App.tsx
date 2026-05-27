@@ -14,9 +14,12 @@ import PlacePage from "./components/pages/PlacePage.tsx";
 import WaitPage from "./components/pages/WaitPage.tsx";
 import NamePage from "./components/pages/NamePage.tsx";
 import GridStatic from "./components/ui/GridStatic.tsx";
-import TestComponent from "./components/ui/TestComponent.tsx";
+// import TestComponent from "./components/ui/TestComponent.tsx";
+import GamePage from "./components/pages/GamePage.tsx";
+import OpponentPage from "./components/pages/OpponentPage.tsx";
+import SwipeLayout from "./components/ui/SwipeLayout.tsx";
 
-const Home = () => <TestComponent/>;
+const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
 const Contact = () => <GridStatic/>;
 
@@ -218,6 +221,8 @@ function App() {
                 <Link to="/place">Place</Link>
                 <Link to="/wait">Wait</Link>
                 <Link to="/name">Name</Link>
+                <Link to="/game">Game</Link>
+                <Link to="/opponent">Opp</Link>
 
                 {/* Or navigate programmatically via functions */}
                 <button onClick={() => navigate('/contact')}>Contact</button>
@@ -229,6 +234,12 @@ function App() {
                 <Navigation/>
                     {/* The router handles all the "manual" switching automatically */}
                 <Routes>
+                    <Route element={<SwipeLayout />}>
+
+                        <Route path="/game" element={<GamePage/>} />
+                        <Route path="/opponent" element={<OpponentPage/>} />
+                    </Route>
+
                     <Route path="/home" element={<HomePage />}/>
                     <Route path="/multiplayer" element={<MultiplayerPage />}/>
                     <Route path="/" element={<Home />} />

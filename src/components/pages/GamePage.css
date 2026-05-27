@@ -82,6 +82,10 @@
     background-color: #B3B3B3;
 }
 
+.game-notification-dot-marine {
+    background-color: var(--marine-color);
+}
+
 .game-button {
     background-color: var(--marine-color);
     height: 100px;
@@ -126,8 +130,13 @@
     justify-content: space-evenly;
     /*width: 100%;*/
     flex-grow: 1;
+    min-height: 100vh;
 }
 
 .game-subtitle {
     margin: 0;
+}
+
+.game-card-wrapper {
+    margin: 10px;
 }
