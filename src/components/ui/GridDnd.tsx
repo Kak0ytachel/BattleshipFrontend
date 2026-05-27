@@ -86,7 +86,7 @@ const TEXTURES: Record<string, string> = (() => {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function cellLabel(col: number, row: number): string {
-    return `${col + 1}${String.fromCharCode(65 + row)}`;
+    return `${col + 1}${String.fromCharCode(65 + row)}`; // TODO check if correct
 }
 
 function fits(col: number, row: number, w: number, h: number): boolean {
@@ -430,7 +430,7 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
                 >
                     {colLabelItems.map((i) => (
                         <div key={i} className="grid-col-label" style={{ width: CELL_SIZE }}>
-                            {i + 1}
+                            {String.fromCharCode(65 + i)}
                         </div>
                     ))}
                 </div>
@@ -447,7 +447,7 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
                     >
                         {rowLabelItems.map((i) => (
                             <div key={i} className="grid-row-label" style={{ height: CELL_SIZE }}>
-                                {String.fromCharCode(65 + i)}
+                                {i + 1}
                             </div>
                         ))}
                     </div>
