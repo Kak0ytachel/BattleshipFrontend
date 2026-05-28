@@ -4,9 +4,11 @@ import botIcon from "/src/assets/home-bot-icon.svg";
 import statsIcon from "/src/assets/home-stats-icon.svg";
 import "./HomePage.css";
 import {useNavigate} from "react-router-dom";
+import {useAppContext} from "../AppContext.tsx";
 
 export default function HomePage() {
     const navigate = useNavigate();
+    const context = useAppContext();
 
     return (
         <div className="home-container">
@@ -34,7 +36,7 @@ export default function HomePage() {
                     </TornCard>
                 </button>
             </div>
-            <button onClick={() => navigate('/contact')}>
+            <button onClick={() => context.sendPING()}>
             <div>
                 <hr/>
                 <img src={statsIcon} alt="stats"/>
