@@ -2,20 +2,23 @@ import './GamePage.css';
 // import {useEffect, useState} from "react";
 import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
+import {useAppContext} from "../AppContext.tsx";
 
 
 
 export default function OpponentPage(){
+    const context = useAppContext();
+
     return (
         <div className={"game-container"}>
             <h3 className={"game-subtitle"}>Twoje pole</h3>
-            <h6 className={"game-subtitle"}>Twoja kolej!</h6>
+            <h6 className={"game-subtitle"}>{context.myTurn? "Twoja kolej!" : "Kolej przeciwnika..."}</h6>
             {/*<div className={"game-indicators"}>*/}
             {/*    <Timer initialTime={10} onFinish={() => console.log('Time is up!')}/>*/}
             {/*    <Bullets/>*/}
             {/*</div>*/}
 
-            <GridStatic active={false}/>
+            <GridStatic active={false} gridData={context.opponentGrid} blocks={context.ownBlocks}/>
             <div className={"game-card-wrapper"}>
                 <TornCard>
                     <div className={"game-notification-card"}>

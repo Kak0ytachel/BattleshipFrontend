@@ -240,7 +240,7 @@ function BlockFace({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface DragDropGridProps {
-    onAllPlaced?: (coords: BlockCoords[]) => void;
+    onAllPlaced?: (coords: BlockCoords[], placed: PlacedBlock[]) => void;
 }
 
 export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
@@ -270,7 +270,7 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
 
     const prevAns = useRef<BlockCoords[] | null>(null);
 
-    // ── Fire onAllPlaced when every block is placed ──
+    //  fire onAllPlaced when every block is placed
     useEffect(() => {
         if (placed.length !== PALETTE.length) { setResult(null); return; }
         const coords: BlockCoords[] = placed.map((p) => {
@@ -287,7 +287,7 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
         setResult(coords);
         if (JSON.stringify(coords) === JSON.stringify(prevAns.current)) return;
         prevAns.current = coords;
-        onAllPlaced?.(coords);
+        onAllPlaced?.(coords, placed);
 
     }, [placed, effectiveWH, onAllPlaced]);
 

@@ -37,10 +37,10 @@ function Timer({initialTime = 90, onFinish = () => {}}) {
 function Bullets({count = 3}) {
     const elements = [];
     for (let i = 0; i < count; i++) {
-        elements.push(<div className={"bullet"}/>);
+        elements.push(<div className={"bullet"} key={i}/>);
     }
     for (let i = count; i < 5; i++) {
-        elements.push(<div className={"bullet-empty"}/>);
+        elements.push(<div className={"bullet-empty"} key={i}/>);
     }
 
     return (
@@ -70,13 +70,13 @@ export default function GamePage(){
     return (
         <div className={"game-container"}>
             <h3 className={"game-subtitle"}>Pole przeciwnika</h3>
-            <h6 className={"game-subtitle"}>Twoja kolej!</h6>
+            <h6 className={"game-subtitle"}>{context.myTurn? "Twoja kolej!" : "Kolej przeciwnika..."}</h6>
             <div className={"game-indicators"}>
-                <Timer initialTime={10} onFinish={() => console.log('Time is up!')}/>
-                <Bullets/>
+                <Timer initialTime={60} onFinish={() => console.log('Time is up!')}/>
+                <Bullets count={Math.min(5, context.answers.length)}/>
             </div>
 
-            <GridStatic/>
+            <GridStatic gridData={context.ownGrid}/>
             <div className={"game-card-wrapper"}>
             <TornCard>
                 <div className={"game-notification-card"}>
@@ -98,7 +98,7 @@ export default function GamePage(){
                     <img src={"src/assets/game-bullet-add.svg"} alt={"add-bullet"}/>
                     {"Zgromadź\nstrzał"}
                 </button>
-                <button className={"game-button"}>
+                <button className={"game-button"} onClick={() => console.log(context.ownGrid)}>
                     <img src={"src/assets/game-place-bomb.svg"} alt={"place-bomb"}/>
                     {"Umieść\nbomby"}
                 </button>
@@ -107,8 +107,8 @@ export default function GamePage(){
                 <span className={"game-notification-dot game-notification-dot-marine"}/>
                 <span className={"game-notification-dot game-notification-dot-gray"}/>
             </div>
-
-            <QuestionPopup show={showQuestionPopup} text={questionNumber} onClick={answerQuestion}/>
+            {/*TODO: replace with real question*/}
+            <QuestionPopup show={showQuestionPopup} text={String(questionNumber)} onClick={answerQuestion}/>
         </div>
     )
 

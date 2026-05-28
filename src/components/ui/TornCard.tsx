@@ -1,7 +1,7 @@
 import './TornCard.css';
 import type {ReactNode} from "react";
 
-type TornCardProps = {"children"?: ReactNode, width: number, height: number, className?: unknown};
+type TornCardProps = {"children"?: ReactNode, width?: number, height?: number, className?: unknown};
 
 export default function TornCard({ children = null, width, height, className = null }: TornCardProps)  {
     return (

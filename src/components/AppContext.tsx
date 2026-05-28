@@ -3,6 +3,7 @@ import {useLocalStorage} from "usehooks-ts";
 import {jwtDecode} from "jwt-decode";
 import {useNavigate} from "react-router-dom";
 import type {BlockCoords} from "./ui/GridDnd.tsx";
+import type {PlacedBlock} from "./ui/GridStatic.tsx";
 // import {Link, MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
 
 
@@ -24,17 +25,34 @@ type Answer = {
     answer: string;
 }
 
+function empty_grid(): Grid {
+    const grid: {[index: string]: {"is_shot": boolean, "has_ship": boolean, "attempted": boolean}} = {};
+    for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 6; j++) {
+            const name: string =`${i + 1}${String.fromCharCode(65 + j)}`;
+            grid[name] = {"is_shot": false, "has_ship": false, "attempted": false};
+        }
+    }
+    return grid;
+}
+
 type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
+type Grid = {[key: string]: {is_shot: boolean, has_ship: boolean, attempted: boolean}}
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
     const socketRef = useRef<WebSocketPlus| null>(null);
+    const userIdRef = useRef<number | null>(null);
 
-    const [user_id, setUserId] = useLocalStorage<string | null>('user_id', null);
+    const [userId, setUserId] = useLocalStorage<string | null>('user_id', null);
     const [ownGameCode, setOwnGameCode] = useLocalStorage<string>('join_game_code', "ERROR!");
-    const [ownBlocks, setOwnBlocks] = useState<BlockCoords[] | null>(null);
+    const [ownBlocks, setOwnBlocks] = useState<PlacedBlock[] | null>(null);
     const [unusedQuestions, setUnusedQuestions] = useState<number[]>([]);
     const [answers, setAnswers] = useState< Answer[] >([]);
+
+    const [ownGrid, setOwnGrid] = useState<Grid>(empty_grid);
+    const [opponentGrid, setOpponentGrid] = useState<Grid>(empty_grid);
+    const [myTurn, setMyTurn] = useState<boolean>(false); // next turn
 
     const navigate = useNavigate();
 
@@ -87,7 +105,22 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             for (const question of questions) {
                 setUnusedQuestions(x => [...x, question]);
             }
-        }
+        },
+        "TURN-INFO": async (websocket, payload_) => {
+            const payload = payload_ as {current_turn: number, "next_turn": number, "grid": Grid, "event": string, "cell": string};
+            const user_id = userIdRef.current;
+            const wasMyTurn = (Number(payload.current_turn) === Number(user_id)); // previous
+            const isMyNextTurn = (Number(payload.next_turn) === Number(user_id)); // next
+            console.log("current", payload.current_turn, "next", payload.next_turn, "user_id", user_id, "isMyNextTurn", isMyNextTurn, "wasMyTurn", wasMyTurn)
+            setMyTurn(isMyNextTurn);
+            if (wasMyTurn) {
+                setOpponentGrid(payload.grid); // prev my turn, their grid
+            } else {
+                setOwnGrid(payload.grid); // prev opponent turn, my grid
+            }
+
+            // TODO: add events log from event and cell
+        },
     }
 
     async function connect_websocket() {
@@ -195,6 +228,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         tokenManager.setToken(token);
         tokenManager.setRefreshToken(refresh_token);
         setUserId(user_id);
+        userIdRef.current = user_id;
 
         console.log("User created with id #" + payload.user_id)
 
@@ -218,7 +252,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 return;
             }
             hasInited.current = true;
-            if (user_id === null) {
+            if (userId === null) {
                 navigate('/name');
                 return;
             }
@@ -269,7 +303,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
 
     return (
-        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, placeShips, getQuestion, handleAnswer}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid}}>
             {children}
         </AppContext.Provider>
     )
@@ -280,10 +314,15 @@ interface AppContextType {
     sendPING: () => void;
     ownGameCode: string | null;
     joinGame: (code: string) => void;
-    setOwnBlocks: (blocks: BlockCoords[] | null) => void;
+    setOwnBlocks: (blocks: PlacedBlock[] | null) => void;
+    ownBlocks: PlacedBlock[] | null;
     placeShips: (cells: string[]) => void;
     getQuestion: () => number;
     handleAnswer: (question: number, answer: string) => void;
+    myTurn: boolean;
+    answers: Answer[];
+    ownGrid: Grid;
+    opponentGrid: Grid;
 }
 
 export function useAppContext(): AppContextType{

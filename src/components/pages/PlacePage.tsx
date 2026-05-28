@@ -3,6 +3,7 @@ import "./PlacePage.css";
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {useAppContext} from "../AppContext.tsx";
+import type {PlacedBlock} from "../ui/GridStatic.tsx";
 
 export default function PlacePage() {
     const navigate = useNavigate();
@@ -10,8 +11,9 @@ export default function PlacePage() {
 
     const [shipCells, setShipCells] = useState<string[]>([]);
 
-    function onPlaced(coords: BlockCoords[]) {
-        context.setOwnBlocks(coords);
+    function onPlaced(coords: BlockCoords[], placed: PlacedBlock[]) {
+        console.log(placed);
+        context.setOwnBlocks(placed);
         const cells: string[] = [];
         for (let i = 0; i < coords.length; i++) {
             const items = coords[i].cells;
@@ -23,11 +25,18 @@ export default function PlacePage() {
         setShipCells(cells);
     }
 
+    function onFinish() {
+        if (!shipCells) {
+            return;
+        }
+        context.placeShips(shipCells)
+    }
+
     return (
         <div>
             <h1>Rozmieść statki</h1>
-            <GridDragAndDrop onAllPlaced={(coords) => onPlaced(coords)}/>
-            <button className={"place-button"} onClick={() => context.placeShips(shipCells)}>
+            <GridDragAndDrop onAllPlaced={onPlaced}/>
+            <button className={"place-button"} onClick={onFinish}>
                 Gotowe
             </button>
         </div>

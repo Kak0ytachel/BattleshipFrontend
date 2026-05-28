@@ -19,7 +19,7 @@ interface Block {
     h: number;
 }
 
-interface PlacedBlock {
+export interface PlacedBlock {
     blockId: string;
     col: number;
     row: number;
@@ -140,8 +140,8 @@ function BlockFace({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function GridStatic({gridData = {}, active = true, bombing = false}:
-    {gridData: Record<string, Record<string, boolean>>, active: boolean, bombing: boolean}) {
+export default function GridStatic({gridData = {}, active = true, bombing = false, blocks = null}:
+    {gridData?: Record<string, Record<string, boolean>>, active?: boolean, bombing?: boolean, blocks?: PlacedBlock[] | null}) {
 
 
     function cellLabel(col: number, row: number): string {
@@ -154,10 +154,11 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
 
 
 
-    const [placed, setPlaced]     = useState<PlacedBlock[]>([
-        {blockId: "a", col: 1, row: 1, rot: 1},
-        {blockId: "d", col: 5, row: 5, rot: 0},
-        {blockId: "e", col: 3, row: 5, rot: 0},
+    const [placed, setPlaced]     = useState<PlacedBlock[]>(
+        blocks || [
+        // {blockId: "a", col: 1, row: 1, rot: 1},
+        // {blockId: "d", col: 5, row: 5, rot: 0},
+        // {blockId: "e", col: 3, row: 5, rot: 0},
     ]);
 
     // const [rotations, setRotations] = useState<Record<string, number>>({"a": 0});
