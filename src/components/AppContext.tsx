@@ -2,6 +2,7 @@ import {createContext, type ReactNode, useContext, useEffect, useRef, useState} 
 import {useLocalStorage} from "usehooks-ts";
 import {jwtDecode} from "jwt-decode";
 import {useNavigate} from "react-router-dom";
+import type {BlockCoords} from "./ui/GridDnd.tsx";
 // import {Link, MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
 
 
@@ -18,6 +19,11 @@ function send_handle(this: WebSocket, type: string, payload: object) {
     }))
 }
 
+type Answer = {
+    questionNumber: number;
+    answer: string;
+}
+
 type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
@@ -25,8 +31,10 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const socketRef = useRef<WebSocketPlus| null>(null);
 
     const [user_id, setUserId] = useLocalStorage<string | null>('user_id', null);
-
     const [ownGameCode, setOwnGameCode] = useLocalStorage<string>('join_game_code', "ERROR!");
+    const [ownBlocks, setOwnBlocks] = useState<BlockCoords[] | null>(null);
+    const [unusedQuestions, setUnusedQuestions] = useState<number[]>([]);
+    const [answers, setAnswers] = useState< Answer[] >([]);
 
     const navigate = useNavigate();
 
@@ -66,6 +74,19 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         },
         "START-GAME": async (websocket, payload) => {
             navigate('/place');
+        },
+        "PLACE-WAIT": async (websocket, payload) => {
+            navigate('/wait');
+        },
+        "PLACE-DONE": async (websocket, payload) => {
+            navigate('/game');
+            requestQuestions();
+        },
+        "QUESTIONS-SEND": async (websocket, payload) => {
+            const questions = (payload as {questions: number[]}).questions;
+            for (const question of questions) {
+                setUnusedQuestions(x => [...x, question]);
+            }
         }
     }
 
@@ -160,12 +181,6 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         }
     }
 
-    async function getQuestions() {
-        if (socketRef.current) {
-            socketRef.current.send_handle("QUESTIONS-GET", {});
-        }
-    }
-
     async function createUser(name: string) {
         const base_url = 'http://localhost:3000/create-user';
         const params = new URLSearchParams({name});
@@ -221,8 +236,40 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         navigate('/home');
     }
 
+    function placeShips(cells: string[]) {
+        if (socketRef.current) {
+            socketRef.current.send_handle("PLACE-SHIPS", {coordinates: cells});
+        } else {
+            console.log("ERROR: no socket connected");
+        }
+    }
+
+    function requestQuestions() {
+        if (socketRef.current) {
+            socketRef.current.send_handle("QUESTIONS-GET", {});
+        } else {
+            console.log("ERROR: no socket connected");
+        }
+    }
+
+    function getQuestion(): number {
+        console.log("unused questions: ", unusedQuestions);
+        const q = unusedQuestions[0];
+        setUnusedQuestions(x => x.slice(1));
+        if (unusedQuestions.length <= 1) {
+            requestQuestions();
+        }
+        return q;
+    }
+
+    function handleAnswer(question: number, answer: string) {
+        setAnswers(x => [...x, {questionNumber: question, answer: answer}]);
+        console.log("answers (prev): ", answers);
+    }
+
+
     return (
-        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, placeShips, getQuestion, handleAnswer}}>
             {children}
         </AppContext.Provider>
     )
@@ -233,6 +280,10 @@ interface AppContextType {
     sendPING: () => void;
     ownGameCode: string | null;
     joinGame: (code: string) => void;
+    setOwnBlocks: (blocks: BlockCoords[] | null) => void;
+    placeShips: (cells: string[]) => void;
+    getQuestion: () => number;
+    handleAnswer: (question: number, answer: string) => void;
 }
 
 export function useAppContext(): AppContextType{

@@ -268,6 +268,8 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
         return { x: e.clientX - rect.left - GRID_PAD, y: e.clientY - rect.top - GRID_PAD };
     }, []);
 
+    const prevAns = useRef<BlockCoords[] | null>(null);
+
     // ── Fire onAllPlaced when every block is placed ──
     useEffect(() => {
         if (placed.length !== PALETTE.length) { setResult(null); return; }
@@ -281,8 +283,12 @@ export default function DragDropGrid({ onAllPlaced }: DragDropGridProps = {}) {
             cells.sort();
             return { blockId: p.blockId, label: block.label, color: block.color, cells };
         });
+
         setResult(coords);
+        if (JSON.stringify(coords) === JSON.stringify(prevAns.current)) return;
+        prevAns.current = coords;
         onAllPlaced?.(coords);
+
     }, [placed, effectiveWH, onAllPlaced]);
 
     // ── Rotation ──

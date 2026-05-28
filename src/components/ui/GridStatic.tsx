@@ -175,7 +175,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
 
     const computeTarget = useCallback((e: React.MouseEvent) => {
         // if (!drag.current) return null;
-        console.log("fired")
+        // console.log("fired")
         const pos = cursorInGrid(e);
         if (!pos) return null;
         const step = CELL_SIZE + GAP;
@@ -277,7 +277,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
             );
         }
     }
-    console.log(bombing)
+    // console.log(bombing)
 
     return (
         <div className="grid-app-static">

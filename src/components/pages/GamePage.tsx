@@ -2,6 +2,8 @@ import './GamePage.css';
 import {useEffect, useState} from "react";
 import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
+import {useAppContext} from "../AppContext.tsx";
+import QuestionPopup from "../ui/QuestionPopup.tsx";
 
 function Timer({initialTime = 90, onFinish = () => {}}) {
     const [time, setTime] = useState(initialTime);
@@ -49,6 +51,22 @@ function Bullets({count = 3}) {
 }
 
 export default function GamePage(){
+    const context = useAppContext();
+    const [showQuestionPopup, setShowQuestionPopup] = useState(false);
+    const [questionNumber, setQuestionNumber] = useState(0);
+
+    function showQuestion() {
+        const qn = context.getQuestion();
+        setQuestionNumber(qn);
+        setShowQuestionPopup(true);
+    }
+
+    function answerQuestion(ans: string) {
+        setShowQuestionPopup(false);
+        console.log(ans);
+        context.handleAnswer(questionNumber, ans);
+    }
+
     return (
         <div className={"game-container"}>
             <h3 className={"game-subtitle"}>Pole przeciwnika</h3>
@@ -76,7 +94,7 @@ export default function GamePage(){
             </TornCard>
             </div>
             <div className={"game-buttons-container"}>
-                <button className={"game-button"}>
+                <button className={"game-button"} onClick={() => showQuestion()}>
                     <img src={"src/assets/game-bullet-add.svg"} alt={"add-bullet"}/>
                     {"Zgromadź\nstrzał"}
                 </button>
@@ -90,7 +108,7 @@ export default function GamePage(){
                 <span className={"game-notification-dot game-notification-dot-gray"}/>
             </div>
 
-
+            <QuestionPopup show={showQuestionPopup} text={questionNumber} onClick={answerQuestion}/>
         </div>
     )
 
