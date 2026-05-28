@@ -5,6 +5,10 @@ import {useNavigate} from "react-router-dom";
 // import {Link, MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
 
 
+async function wait(ms: number) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const AppContext = createContext(null);
 
 function send_handle(this: WebSocket, type: string, payload: object) {
@@ -18,8 +22,11 @@ type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
-    const [socket, setSocket] = useState< WebSocketPlus| null>(null);
+    const socketRef = useRef<WebSocketPlus| null>(null);
+
     const [user_id, setUserId] = useLocalStorage<string | null>('user_id', null);
+
+    const [ownGameCode, setOwnGameCode] = useLocalStorage<string>('join_game_code', "ERROR!");
 
     const navigate = useNavigate();
 
@@ -41,15 +48,24 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const events: Record<string, (websocket: WebSocketPlus, payload: object) => void> = {
         PING: async (websocket, payload) => {
             websocket.send_handle("PONG", {});
+            console.log("ping ws ", socketRef.current)
+        },
+        "HELLO": async (websocket, payload) => {
+            await wait(1000);
+            updateCode();
         },
         "JOIN-CODE": async (websocket, payload) => {
-            console.log('event fired');
-            const element: Element | null = document.getElementById("show-join-code");
-            if (!element) {
-                console.log("ERROR: unable to find #show-join-code");
-                return;
-            }
-            element.textContent = (payload as {join_code: string}).join_code;
+            // console.log('event fired');
+            const code = (payload as {join_code: string}).join_code;
+            console.log("JOIN CODE: " + code);
+            setOwnGameCode(code);
+        },
+        "ERROR-CODE": async (websocket, payload) => {
+            const wsEvent = new CustomEvent('ERROR-CODE');
+            window.dispatchEvent(wsEvent);
+        },
+        "START-GAME": async (websocket, payload) => {
+            navigate('/place');
         }
     }
 
@@ -73,7 +89,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         ws.send_handle = send_handle;
 
         ws.onopen = (event) => {
-            setSocket(ws)
+            socketRef.current = ws;
         }
 
         ws.onmessage = (event) => {
@@ -119,28 +135,34 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     }
 
     function sendPING() {
-        if (socket) {
-            socket.send_handle("PING", {});
+        if (socketRef.current) {
+            socketRef.current.send_handle("PING", {});
+        } else {
+            console.log("ERROR: no socket connected");
         }
     }
 
-    function createGame() {
-        if (socket) {
-            socket.send_handle("CREATE-GAME", {});
+    function updateCode() {
+        if (socketRef.current) {
+            socketRef.current.send_handle("CREATE-GAME", {});
+        } else {
+            console.log("ERROR: no socket connected");
         }
     }
 
-    function joinGame() {
-        if (socket) {
-            const element = document.getElementById("join-code");
-            const join_code = (element as HTMLInputElement).value;
-            socket.send_handle("JOIN-GAME", {join_code: join_code});
+    function joinGame(code: string) {
+        if (socketRef.current) {
+            // const element = document.getElementById("join-code");
+            // const join_code = (element as HTMLInputElement).value;
+            socketRef.current.send_handle("JOIN-GAME", {join_code: code});
+        } else {
+            console.log("ERROR: no socket connected");
         }
     }
 
     async function getQuestions() {
-        if (socket) {
-            socket.send_handle("QUESTIONS-GET", {});
+        if (socketRef.current) {
+            socketRef.current.send_handle("QUESTIONS-GET", {});
         }
     }
 
@@ -185,7 +207,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 navigate('/name');
                 return;
             }
-            if (socket === null) {
+            if (socketRef.current === null) {
                 await connect_websocket();
             }
             return () => {};
@@ -200,10 +222,23 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     }
 
     return (
-        <AppContext.Provider value={{lateInit, sendPING}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame}}>
             {children}
         </AppContext.Provider>
     )
 }
 
-export const useAppContext = () => useContext(AppContext);
+interface AppContextType {
+    lateInit: (name: string) => Promise<void>;
+    sendPING: () => void;
+    ownGameCode: string | null;
+    joinGame: (code: string) => void;
+}
+
+export function useAppContext(): AppContextType{
+    const context = useContext(AppContext);
+    if (context === undefined) {
+        throw new Error('useAppContext must be used within a AppContextProvider');
+    }
+    return (context as unknown as AppContextType);
+}

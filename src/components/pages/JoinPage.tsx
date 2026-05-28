@@ -6,9 +6,34 @@ import "./JoinPage.css"
 
 import "./HomePage.css"
 import OtpInput from "../ui/OtpInput.tsx";
+import {useAppContext} from "../AppContext.tsx";
+import {useEffect, useRef} from "react";
 
 export default function JoinPage() {
     const navigate = useNavigate();
+    const context = useAppContext();
+    const errRef = useRef<HTMLDivElement>(null);
+
+
+    function clickCopy() {
+        const element = errRef.current as HTMLElement;
+
+        if (!element.classList.contains("create-link-copied-animated")) {
+            element.classList.add("create-link-copied-animated");
+        } else {
+            element.classList.remove("create-link-copied-blink");
+            void element.offsetWidth;
+            element.classList.add("create-link-copied-blink");
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('ERROR-CODE', clickCopy);
+
+        return () => {
+            window.removeEventListener('ERROR-CODE', clickCopy);
+        };
+    }, []);
 
     return (
         <>
@@ -23,7 +48,11 @@ export default function JoinPage() {
 
                     <h3>Wpisz kod gry</h3>
 
-                    <OtpInput onComplete={() => navigate('/contact')}/>
+                    <OtpInput onComplete={(code) => context.joinGame(code)}/>
+                    <div className={"create-link-copied-container"}>
+                        <div ref={errRef} className={"join-code-error"} >Błedny kod, sprobój ponownie!</div>
+                    </div>
+
                     <div><hr className={"short-hr"}/></div>
 
                     <span className={"join-description"}>
