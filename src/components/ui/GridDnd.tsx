@@ -85,7 +85,7 @@ const TEXTURES: Record<string, string> = (() => {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function cellLabel(col: number, row: number): string {
+export function cellLabel(col: number, row: number): string {
     return `${col + 1}${String.fromCharCode(65 + row)}`; // TODO check if correct
 }
 

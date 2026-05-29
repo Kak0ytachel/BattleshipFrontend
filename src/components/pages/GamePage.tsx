@@ -4,6 +4,7 @@ import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
 import {useAppContext} from "../AppContext.tsx";
 import QuestionPopup from "../ui/QuestionPopup.tsx";
+import {cellLabel} from "../ui/GridDnd.tsx";
 
 function Timer({initialTime = 90, onFinish = () => {}}) {
     const [time, setTime] = useState(initialTime);
@@ -67,6 +68,21 @@ export default function GamePage(){
         context.handleAnswer(questionNumber, ans);
     }
 
+    function shoot(e: MouseEvent, col: number, row: number) {
+        console.log(col, row, cellLabel(col, row))
+        if (!context.myTurn) {
+            console.log("not my turn");
+            // TODO: add message
+            return;
+        }
+        if (context.answers.length <= 0) {
+            // TODO: add message
+            console.log("no answers");
+            return;
+        }
+        context.sendShoot(col, row)
+    }
+
     return (
         <div className={"game-container"}>
             <h3 className={"game-subtitle"}>Pole przeciwnika</h3>
@@ -76,7 +92,7 @@ export default function GamePage(){
                 <Bullets count={Math.min(5, context.answers.length)}/>
             </div>
 
-            <GridStatic gridData={context.ownGrid}/>
+            <GridStatic gridData={context.opponentGrid} turn={context.myTurn} onShoot={shoot}/>
             <div className={"game-card-wrapper"}>
             <TornCard>
                 <div className={"game-notification-card"}>

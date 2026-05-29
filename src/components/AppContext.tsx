@@ -2,7 +2,7 @@ import {createContext, type ReactNode, useContext, useEffect, useRef, useState} 
 import {useLocalStorage} from "usehooks-ts";
 import {jwtDecode} from "jwt-decode";
 import {useNavigate} from "react-router-dom";
-import type {BlockCoords} from "./ui/GridDnd.tsx";
+import {type BlockCoords, cellLabel} from "./ui/GridDnd.tsx";
 import type {PlacedBlock} from "./ui/GridStatic.tsx";
 // import {Link, MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
 
@@ -116,7 +116,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             if (wasMyTurn) {
                 setOpponentGrid(payload.grid); // prev my turn, their grid
             } else {
-                setOwnGrid(payload.grid); // prev opponent turn, my grid
+                setOwnGrid(payload.grid);// prev opponent turn, my grid
             }
 
             // TODO: add events log from event and cell
@@ -301,9 +301,21 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         console.log("answers (prev): ", answers);
     }
 
+    function sendShoot(col: number, row: number) {
+        // {questionIndex: number, answer: string, coordinate: string}
+        const label = cellLabel(col, row);
+        const answer_ = answers[0];
+        setAnswers(x => x.slice(1));
+        const questionIndex = answer_.questionNumber;
+        const answerText = answer_.answer;
+
+        (socketRef.current as WebSocketPlus)
+            .send_handle("SHOOT", {questionIndex: questionIndex, answer: answerText, coordinate: label})
+    }
+
 
     return (
-        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot}}>
             {children}
         </AppContext.Provider>
     )
@@ -323,6 +335,7 @@ interface AppContextType {
     answers: Answer[];
     ownGrid: Grid;
     opponentGrid: Grid;
+    sendShoot: (col: number, row: number) => void;
 }
 
 export function useAppContext(): AppContextType{

@@ -140,8 +140,8 @@ function BlockFace({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function GridStatic({gridData = {}, active = true, bombing = false, blocks = null}:
-    {gridData?: Record<string, Record<string, boolean>>, active?: boolean, bombing?: boolean, blocks?: PlacedBlock[] | null}) {
+export default function GridStatic({gridData = {}, active = true, bombing = false, blocks = null, turn = true, onShoot = () => {}}:
+    {gridData?: Record<string, Record<string, boolean>>, active?: boolean, bombing?: boolean, blocks?: PlacedBlock[] | null, turn?: boolean, onShoot: (e: MouseEvent, col: number, row: number) => void}) {
 
 
     function cellLabel(col: number, row: number): string {
@@ -184,7 +184,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
         const row = Math.min(Math.floor((pos.y) / step), 5 );
         const w = 1;
         const h = 1;
-        const valid = true;
+        const valid = turn
         return { col, row, w, h, valid};
     }, [placed, cursorInGrid]);
 
@@ -351,14 +351,14 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
                         {/* Drop ghost */}
                         {ghost && (
                             <div
-                                className={`drop-ghost-static ${ghost.valid ? "drop-ghost-static--valid" : "drop-ghost-static--invalid"} ${bombing? "drop-ghost-static-bomb": "drop-ghost-static-sight" }`}
+                                className={`drop-ghost-static ${ghost.valid ? "drop-ghost-static--valid" : "drop-ghost-static--invalid"} ${turn? (bombing? "drop-ghost-static-bomb": "drop-ghost-static-sight") : "" }`}
                                 style={{
                                     left:   ghost.col * (CELL_SIZE + GAP) + GRID_PAD,
                                     top:    ghost.row * (CELL_SIZE + GAP) + GRID_PAD,
                                     width:  ghost.w * CELL_SIZE + (ghost.w - 1) * GAP,
                                     height: ghost.h * CELL_SIZE + (ghost.h - 1) * GAP,
                                 }}
-                                onClick={(e) => window.alert(`clicked ${cellLabel(ghost.col, ghost.row)}`)}
+                                onClick={(e) => onShoot(e, ghost.col, ghost.row)}
                             />
                         )}
 

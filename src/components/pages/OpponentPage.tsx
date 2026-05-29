@@ -18,7 +18,7 @@ export default function OpponentPage(){
             {/*    <Bullets/>*/}
             {/*</div>*/}
 
-            <GridStatic active={false} gridData={context.opponentGrid} blocks={context.ownBlocks}/>
+            <GridStatic active={false} gridData={context.ownGrid} blocks={context.ownBlocks}/>
             <div className={"game-card-wrapper"}>
                 <TornCard>
                     <div className={"game-notification-card"}>
