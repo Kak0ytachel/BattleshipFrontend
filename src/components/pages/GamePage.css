@@ -133,10 +133,28 @@
     min-height: 100vh;
 }
 
+.game-title {
+    font-size: 34px;
+    font-weight: 700;
+    margin: 0 0 5px;
+}
+
 .game-subtitle {
     margin: 0;
+    color: var(--helper-color)
 }
 
 .game-card-wrapper {
     margin: 10px;
+}
+
+.opponent-game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    /*width: 100%;*/
+    flex-grow: 1;
+    min-height: 100vh;
+    margin-top: 100px;
 }

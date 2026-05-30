@@ -24,8 +24,9 @@
 }
 
 .name-card-text {
-    font-size: 32px;
+    /*font-size: 32px;*/
     font-weight: 300;
+    color: var(--helper-color);
 }
 
 .name-input {
@@ -37,7 +38,7 @@
     background-color: white;
     font-family: "Rowdies", sans-serif;
     font-weight: 300;
-    color: #91959c;
+    color: var(--light-gray-color);
     border-radius: 8px;
     font-size: 18px;
     /*margin: 20px 0;*/

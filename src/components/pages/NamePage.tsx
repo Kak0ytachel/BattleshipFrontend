@@ -12,15 +12,15 @@ export default function NamePage() {
     return (
         <div className={"name-container"}>
             <h1>Bitwa morska</h1>
-            <TornCard width={300} height={400}>
+            <TornCard width={300} height={350}>
                 <div className={"name-card-container"}>
                     <h1 className={"name-card-title"}>Witam!</h1>
                     <h3 className={"name-card-text"}>Podaj swoje imie</h3>
-                        <input className={"name-input"} type={"text"} placeholder={"Wpisz tutaj..."} ref={inputRef}/>
-                        <button className={"name-button"} onClick={
-                            async () =>
-                                await context.lateInit((inputRef.current as HTMLInputElement).value)
-                        }>Dalej</button>
+                    <input className={"name-input"} type={"text"} placeholder={"Wpisz tutaj..."} ref={inputRef}/>
+                    <button className={"name-button"} onClick={
+                        async () =>
+                            await context.lateInit((inputRef.current as HTMLInputElement).value)
+                    }>Dalej</button>
                 </div>
             </TornCard>
 

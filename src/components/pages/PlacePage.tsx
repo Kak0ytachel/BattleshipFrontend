@@ -35,6 +35,7 @@ export default function PlacePage() {
     return (
         <div>
             <h1>Rozmieść statki</h1>
+            <p className={"place-helper"}>{"kliknij, aby obrócić · przeciągnij, aby umieścić \nkliknij dwukrotnie, aby usunąć umieszczony statek"}</p>
             <GridDragAndDrop onAllPlaced={onPlaced}/>
             <button className={"place-button"} onClick={onFinish}>
                 Gotowe

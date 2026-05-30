@@ -3,6 +3,25 @@
 :root{
   --text-color: #445672;
   --marine-color: #4F6179;
+  --blue-color: #7A8DA8;
+  --helper-color: #939FB1;
+  --light-gray-color: #91959c;
+  --input-placeholder-color: #C7CDD6;
+}
+
+input {
+  color: var(--marine-color);
+}
+
+input:focus {
+  border-color: var(--blue-color);
+}
+input::placeholder {
+  color: var(--input-placeholder-color);
+}
+
+input:focus-visible {
+  outline: none;
 }
 
 h1 {
@@ -12,6 +31,7 @@ h1 {
   font-size: 50px;
   font-style: normal;
   line-height: 100%;
+  margin-block: 0.1em;
 }
 
 h2 {
@@ -28,9 +48,10 @@ h3 {
   font-family: "Rowdies", sans-serif;
   font-weight: 400;
   font-size: 28px;
-  margin-block: 0.5em;
+  /*margin-block: 0.5em;*/
   margin-inline: auto;
   white-space: nowrap;
+  margin-block: 0.1em;
 }
 
 h5 {

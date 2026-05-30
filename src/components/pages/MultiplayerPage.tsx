@@ -24,7 +24,7 @@ export default function MultiplayerPage() {
                     <button onClick={() => navigate('/create')}>
                         <TornCard height={250} width={250}>
                             <h3> Stwórz grę</h3>
-                            <h5>Utwórz link i zaproś przyjaciela</h5>
+                            <h5 className={"home-description"}>Utwórz link i zaproś przyjaciela</h5>
                             <img src={createIcon} alt="create-game" />
                         </TornCard>
                         {/*<div className={"home-soon-helper"}>*/}
@@ -38,7 +38,7 @@ export default function MultiplayerPage() {
                     <button onClick={() => navigate('/join')}>
                         <TornCard height={250} width={250}>
                             <h3> Dołącz do gry</h3>
-                            <h5>Wklej link od przyjaciela</h5>
+                            <h5 className={"home-description"}>Wklej link od przyjaciela</h5>
                             <img src={joinIcon} alt="join-game" />
                         </TornCard>
                     </button>

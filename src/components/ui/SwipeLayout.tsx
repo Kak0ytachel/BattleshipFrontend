@@ -46,18 +46,6 @@ const SwipeLayout = () => {
             <main key={location.pathname} className={`page-content ${animationClass}`}>
                 <Outlet />
             </main>
-
-            {/* Page Indicators */}
-            <div className="page-indicators">
-                {PAGES.map((path, index) => (
-                    <button
-                        key={path}
-                        className={`indicator-dot ${index === currentIndex ? 'active' : ''}`}
-                        onClick={() => handleDotClick(index)}
-                        aria-label={`Go to page ${index + 1}`}
-                    />
-                ))}
-            </div>
         </div>
     );
 };

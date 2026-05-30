@@ -6,6 +6,7 @@
     white-space: pre-wrap;
     font-family: "Rowdies", sans-serif;
     font-weight: 300;
+    color: var(--helper-color)
 }
 
 .join-subcontainer {
@@ -23,7 +24,7 @@
 .join-code-error {
     font-family: "Rowdies", sans-serif;
     font-weight: 300;
-    color: #7A8DA8;
+    color: var(--blue-color);
     position: absolute;
     transform: translate(-50%, -50%);
     opacity: 0;

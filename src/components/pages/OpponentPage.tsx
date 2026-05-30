@@ -11,8 +11,10 @@ export default function OpponentPage(){
 
     return (
         <div className={"game-container"}>
-            <h3 className={"game-subtitle"}>Twoje pole</h3>
+            <div>
+            <h3 className={"game-title"}>Twoje pole</h3>
             <h6 className={"game-subtitle"}>{context.myTurn? "Twoja kolej!" : "Kolej przeciwnika..."}</h6>
+            </div>
             {/*<div className={"game-indicators"}>*/}
             {/*    <Timer initialTime={10} onFinish={() => console.log('Time is up!')}/>*/}
             {/*    <Bullets/>*/}

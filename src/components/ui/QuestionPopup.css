@@ -10,6 +10,7 @@
     font-family: "Rowdies", sans-serif;
     font-weight: 300;
     font-size: 18px;
+    color: var(--light-gray-color);
 }
 
 .popup-container {
