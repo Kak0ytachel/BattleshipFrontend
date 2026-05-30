@@ -55,7 +55,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
     const [ownGrid, setOwnGrid] = useState<Grid>(empty_grid);
     const [opponentGrid, setOpponentGrid] = useState<Grid>(empty_grid);
-    const [myTurn, setMyTurn] = useState<boolean>(false); // next turn
+    const myTurn = useRef<boolean>(false); // next turn
     const lastShot = useRef<LastShot | null>(null);
 
     const navigate = useNavigate();
@@ -116,7 +116,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             const wasMyTurn = (Number(payload.current_turn) === Number(user_id)); // previous
             const isMyNextTurn = (Number(payload.next_turn) === Number(user_id)); // next
             console.log("current", payload.current_turn, "next", payload.next_turn, "user_id", user_id, "isMyNextTurn", isMyNextTurn, "wasMyTurn", wasMyTurn)
-            setMyTurn(isMyNextTurn);
+            myTurn.current = isMyNextTurn;
             if (wasMyTurn) {
                 setOpponentGrid(payload.grid); // prev my turn, their grid
 
@@ -341,7 +341,7 @@ interface AppContextType {
     placeShips: (cells: string[]) => void;
     getQuestion: () => number;
     handleAnswer: (question: number, answer: string) => void;
-    myTurn: boolean;
+    myTurn: RefObject<boolean>;
     answers: Answer[];
     ownGrid: Grid;
     opponentGrid: Grid;

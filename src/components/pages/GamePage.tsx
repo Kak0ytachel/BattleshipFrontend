@@ -57,7 +57,6 @@ export default function GamePage(){
     const [showQuestionPopup, setShowQuestionPopup] = useState(false);
     const [questionNumber, setQuestionNumber] = useState(0);
     const [showAnswerPopup, setShowAnswerPopup] = useState(false);
-    const [lastShot, setLastShot] = useState<LastShot | undefined>(undefined);
 
     function showQuestion() {
         const qn = context.getQuestion();
@@ -73,7 +72,7 @@ export default function GamePage(){
 
     function shoot(e: MouseEvent, col: number, row: number) {
         console.log(col, row, cellLabel(col, row))
-        if (!context.myTurn) {
+        if (!context.myTurn.current) {
             console.log("not my turn");
             // TODO: add message
             return;
@@ -112,14 +111,14 @@ export default function GamePage(){
         <div className={"game-container"}>
             <div>
                 <h3 className={"game-title"}>Pole przeciwnika</h3>
-                <h6 className={"game-subtitle"}>{context.myTurn? "Twoja kolej!" : "Kolej przeciwnika..."}</h6>
+                <h6 className={"game-subtitle"}>{context.myTurn.current? "Twoja kolej!" : "Kolej przeciwnika..."}</h6>
             </div>
             <div className={"game-indicators"}>
                 <Timer initialTime={60} onFinish={() => console.log('Time is up!')}/>
                 <Bullets count={Math.min(5, context.answers.length)}/>
             </div>
 
-            <GridStatic gridData={context.opponentGrid} turn={context.myTurn} onShoot={shoot}/>
+            <GridStatic gridData={context.opponentGrid} turn={context.myTurn.current} onShoot={shoot}/>
             <div className={"game-card-wrapper"}>
             <TornCard>
                 <div className={"game-notification-card"}>
