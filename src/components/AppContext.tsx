@@ -1,4 +1,4 @@
-import {createContext, type ReactNode, useContext, useEffect, useRef, useState} from "react";
+import {createContext, type ReactNode, type Ref, type RefObject, useContext, useEffect, useRef, useState} from "react";
 import {useLocalStorage} from "usehooks-ts";
 import {jwtDecode} from "jwt-decode";
 import {useNavigate} from "react-router-dom";
@@ -38,6 +38,9 @@ function empty_grid(): Grid {
 
 type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 type Grid = {[key: string]: {is_shot: boolean, has_ship: boolean, attempted: boolean}}
+export type LastShot = {questionIndex: number, answer: string, correct: string}
+type ShotPayload = {current_turn: number, next_turn: number, grid: Grid, event: string, cell: string,
+    question?: number, correct?: string, answer?: string}
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
@@ -53,6 +56,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const [ownGrid, setOwnGrid] = useState<Grid>(empty_grid);
     const [opponentGrid, setOpponentGrid] = useState<Grid>(empty_grid);
     const [myTurn, setMyTurn] = useState<boolean>(false); // next turn
+    const lastShot = useRef<LastShot | null>(null);
 
     const navigate = useNavigate();
 
@@ -107,7 +111,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             }
         },
         "TURN-INFO": async (websocket, payload_) => {
-            const payload = payload_ as {current_turn: number, "next_turn": number, "grid": Grid, "event": string, "cell": string};
+            const payload = payload_ as ShotPayload;
             const user_id = userIdRef.current;
             const wasMyTurn = (Number(payload.current_turn) === Number(user_id)); // previous
             const isMyNextTurn = (Number(payload.next_turn) === Number(user_id)); // next
@@ -115,6 +119,12 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             setMyTurn(isMyNextTurn);
             if (wasMyTurn) {
                 setOpponentGrid(payload.grid); // prev my turn, their grid
+
+                const questionIndex = payload.question as number;
+                const answer = payload.answer as string;
+                const correct = payload.correct as string;
+                lastShot.current = {questionIndex, answer, correct};
+                window.dispatchEvent(new CustomEvent('SHOW-ANSWER'));
             } else {
                 setOwnGrid(payload.grid);// prev opponent turn, my grid
             }
@@ -315,7 +325,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
 
     return (
-        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot}}>
             {children}
         </AppContext.Provider>
     )
@@ -336,6 +346,7 @@ interface AppContextType {
     ownGrid: Grid;
     opponentGrid: Grid;
     sendShoot: (col: number, row: number) => void;
+    lastShot: RefObject<LastShot | null> ;
 }
 
 export function useAppContext(): AppContextType{

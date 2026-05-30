@@ -1,10 +1,11 @@
 import './GamePage.css';
-import {useEffect, useState} from "react";
+import {type JSX, useEffect, useState} from "react";
 import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
-import {useAppContext} from "../AppContext.tsx";
+import {type LastShot, useAppContext} from "../AppContext.tsx";
 import QuestionPopup from "../ui/QuestionPopup.tsx";
 import {cellLabel} from "../ui/GridDnd.tsx";
+import AnswerPopup from "../ui/AnswerPopup.tsx";
 
 function Timer({initialTime = 90, onFinish = () => {}}) {
     const [time, setTime] = useState(initialTime);
@@ -55,6 +56,8 @@ export default function GamePage(){
     const context = useAppContext();
     const [showQuestionPopup, setShowQuestionPopup] = useState(false);
     const [questionNumber, setQuestionNumber] = useState(0);
+    const [showAnswerPopup, setShowAnswerPopup] = useState(false);
+    const [lastShot, setLastShot] = useState<LastShot | undefined>(undefined);
 
     function showQuestion() {
         const qn = context.getQuestion();
@@ -65,7 +68,7 @@ export default function GamePage(){
     function answerQuestion(ans: string) {
         setShowQuestionPopup(false);
         console.log(ans);
-        context.handleAnswer(questionNumber, ans);
+        context.handleAnswer(questionNumber, ans); // delete the question being answered from the queue TODO move to after answering
     }
 
     function shoot(e: MouseEvent, col: number, row: number) {
@@ -82,6 +85,28 @@ export default function GamePage(){
         }
         context.sendShoot(col, row)
     }
+
+    function showAnswer() {
+        // console.log("show answer");
+        // console.log("self last shot", lastShot);
+        // console.log("context last shot", context.lastShot.current);
+        setShowAnswerPopup(true);
+    }
+
+    // useEffect(() => {
+    //     console.log("last shot", context.lastShot);
+    //     if (context.lastShot != undefined) {
+    //         showAnswer();
+    //     }
+    // }, [context.lastShot])
+
+    useEffect(() => {
+        window.addEventListener('SHOW-ANSWER', showAnswer);
+
+        return () => {
+            window.removeEventListener('SHOW-ANSWER', showAnswer);
+        };
+    }, []);
 
     return (
         <div className={"game-container"}>
@@ -126,7 +151,11 @@ export default function GamePage(){
                 <span className={"game-notification-dot game-notification-dot-gray"}/>
             </div>
             {/*TODO: replace with real question*/}
-            <QuestionPopup show={showQuestionPopup} text={String(questionNumber)} onClick={answerQuestion}/>
+            <QuestionPopup show={showQuestionPopup} index={questionNumber} onClick={answerQuestion}/>
+            <AnswerPopup show={showAnswerPopup}
+                         answer={context.lastShot.current?.answer} correct={context.lastShot.current?.correct}
+                         index={context.lastShot.current?.questionIndex}
+            onClick={() => setShowAnswerPopup(false)}/>
         </div>
     )
 

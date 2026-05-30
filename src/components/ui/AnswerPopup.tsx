@@ -2,6 +2,7 @@ import TornCard from "../ui/TornCard.tsx";
 import {useNavigate} from "react-router-dom";
 import "./QuestionPopup.css";
 import {useRef, useState} from "react";
+import {getQuestion} from "./QuestionPopup.tsx";
 
 const fuzzy_sets: string[][]  = [["l", "ł"], ["ł", "l", "l"]];
 
@@ -35,7 +36,7 @@ function findMatchedIndices(str1: string, str2: string) {
         }
     }
 
-    console.log(dp);
+    // console.log(dp);
     // backwards
     const str1_matches = new Map<number, string>();
     const str2_matches = new Map<number, string>();
@@ -54,7 +55,7 @@ function findMatchedIndices(str1: string, str2: string) {
         } else {
             j--;
         }
-        console.log("cycle 2");
+        // console.log("cycle 2");
     }
     return [str1_matches, str2_matches];
 }
@@ -63,8 +64,8 @@ function findMatchedIndices(str1: string, str2: string) {
 function answerCheker(str1: string, str2: string) {
     const [str1_matches, str2_matches] = findMatchedIndices(str1, str2);
 
-    console.log(str1_matches);
-    console.log(str2_matches);
+    // console.log(str1_matches);
+    // console.log(str2_matches);
 
     const results_str1: [string, string][] = [];
     const results_str2: [string, string][] = [];
@@ -128,13 +129,13 @@ function answerCheker(str1: string, str2: string) {
         elements2.push(<span key={i} className={className(results_str2[i][1])}>{results_str2[i][0]}</span>)
     }
 
-    console.log(results_str1);
-    console.log(results_str2);
+    // console.log(results_str1);
+    // console.log(results_str2);
 
     return [elements1, elements2, ans]
 }
 
-export default function AnswerPopup({show = false, text = "45.\tNauka biologiczna badająca wzajemne zależności między organizmami a środowiskiem i odwrotnie", answer = "biologia", correct = "ekologia", onClick = (s: string) => {console.log(s)}}) {
+export default function AnswerPopup({show = false, text = "45.\tNauka biologiczna badająca wzajemne zależności między organizmami a środowiskiem i odwrotnie", answer = "biologia", correct = "ekologia", index = 1, onClick = () => {}}) {
     const inputRef = useRef<HTMLInputElement>(null);
     const popupRef = useRef<HTMLDivElement>(null);
     const [word2, word1, status] = answerCheker(answer, correct);
@@ -156,7 +157,7 @@ export default function AnswerPopup({show = false, text = "45.\tNauka biologiczn
             <TornCard width={350} height={450}>
                 <div className={"name-card-container"}>
                     <h6 className={"popup-title"}>{title}</h6>
-                    <span className={"popup-description"}>{text}</span>
+                    <span className={"popup-description"}>{getQuestion(index)}</span>
                     <div className={"popup-answer-container"}>
                         <div className={"popup-subtitle"}>Poprawna odpowiedz:</div>
                         <div className={"popup-answer"}> {word1}</div>
@@ -167,9 +168,8 @@ export default function AnswerPopup({show = false, text = "45.\tNauka biologiczn
                     </div>
 
                     <button className={"name-button"} onClick={
-                        () => {
-                            answerCheker(answer, correct);
-                            (popupRef.current as HTMLElement).classList.add("popup-disabled");
+                        () => { onClick()
+
                         }
                     }>OK</button>
                 </div>

@@ -3,7 +3,9 @@ import {useNavigate} from "react-router-dom";
 import "./QuestionPopup.css";
 import {useRef, useState} from "react";
 
-export default function QuestionPopup({show = false, text = "45.\tNauka biologiczna badająca wzajemne zależności między organizmami a środowiskiem i odwrotnie", onClick = (s: string) => {console.log(s)}}) {
+import questions from "/src/assets/questions.json";
+
+export default function QuestionPopup({show = false, index = 1, onClick = (s: string) => {console.log(s)}}) {
     const inputRef = useRef<HTMLInputElement>(null);
     const popupRef = useRef<HTMLDivElement>(null);
 
@@ -13,7 +15,7 @@ export default function QuestionPopup({show = false, text = "45.\tNauka biologic
             <TornCard width={350} height={450}>
                 <div className={"name-card-container"}>
                     <h6 className={"popup-title"}>Podaj definicje</h6>
-                    <span className={"popup-description"}>{text}</span>
+                    <span className={"popup-description"}>{getQuestion(index)}</span>
                     <input className={"name-input"} type={"text"} placeholder={"Wpisz tutaj..."} ref={inputRef}/>
                     <button className={"name-button"} onClick={
                         () => {
@@ -26,4 +28,12 @@ export default function QuestionPopup({show = false, text = "45.\tNauka biologic
             </TornCard>
         </div>
     )
+}
+
+
+export function getQuestion(index: string | number = "1") {
+    index = String(index)
+    const q_: Map<string, string> = new Map(Object.entries(questions));
+    // console.log(q_);
+    return q_.get(index) || "Nie znaleziono pytania";
 }
