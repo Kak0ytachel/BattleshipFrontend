@@ -140,8 +140,8 @@ function BlockFace({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function GridStatic({gridData = {}, active = true, bombing = false, blocks = null, turn = true, onShoot = () => {}}:
-    {gridData?: Record<string, Record<string, boolean>>, active?: boolean, bombing?: boolean, blocks?: PlacedBlock[] | null, turn?: boolean, onShoot: (e: MouseEvent, col: number, row: number) => void}) {
+export default function GridStatic({gridData = {}, active = true, bombing = false, blocks = null, turn = true, onShoot = () => {}, haloBlocks = undefined}:
+    {gridData?: Record<string, Record<string, boolean>>, active?: boolean, bombing?: boolean, blocks?: PlacedBlock[] | null, turn?: boolean, onShoot: (e: MouseEvent, col: number, row: number) => void, haloBlocks?: PlacedBlock[]}) {
 
     function cellLabel(col: number, row: number): string {
         return `${col + 1}${String.fromCharCode(65 + row)}`;
@@ -226,7 +226,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
     const occupiedCells  = new Set<string>();
     const haloCells      = new Set<string>();
 
-    for (const p of placed) {
+    for (const p of haloBlocks || placed) {
         const base = PALETTE.find((x) => x.id === p.blockId)!;
         const { w: bw, h: bh } = effectiveWH(base, p);
         for (let r = p.row; r < p.row + bh; r++)

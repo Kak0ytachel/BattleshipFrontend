@@ -118,7 +118,7 @@ export default function GamePage(){
                 <Bullets count={Math.min(5, context.answers.length)}/>
             </div>
 
-            <GridStatic gridData={context.opponentGrid} turn={context.myTurn.current} onShoot={shoot}/>
+            <GridStatic gridData={context.opponentGrid} turn={context.myTurn.current} onShoot={shoot} blocks={context.opponentPlacedBlocks.current}/>
             <div className={"game-card-wrapper"}>
             <TornCard>
                 <div className={"game-notification-card"}>

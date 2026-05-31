@@ -40,7 +40,7 @@ type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 type Grid = {[key: string]: {is_shot: boolean, has_ship: boolean, attempted: boolean}}
 export type LastShot = {questionIndex: number, answer: string, correct: string}
 type ShotPayload = {current_turn: number, next_turn: number, grid: Grid, event: string, cell: string,
-    question?: number, correct?: string, answer?: string}
+    question?: number, correct?: string, answer?: string, result?: string}
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
@@ -57,6 +57,8 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const [opponentGrid, setOpponentGrid] = useState<Grid>(empty_grid);
     const myTurn = useRef<boolean>(false); // next turn
     const lastShot = useRef<LastShot | null>(null);
+    const myPlacedBlocks = useRef<PlacedBlock[]>([]);
+    const opponentPlacedBlocks = useRef<PlacedBlock[]>([]);
 
     const navigate = useNavigate();
 
@@ -127,6 +129,74 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 window.dispatchEvent(new CustomEvent('SHOW-ANSWER'));
             } else {
                 setOwnGrid(payload.grid);// prev opponent turn, my grid
+            }
+
+            if (payload.event == "SHOOT") {
+                const result = payload.result as string;
+                if (result === "SUNK") {
+                    const grid = payload.grid;
+
+                    const coordinate = payload.cell;
+                    const base_x: number = Number(coordinate.split("")[0]); // 1-based
+                    const base_y: number = Number(coordinate.charCodeAt(1) - 64); // 1-based
+                    const vals_x: number[] = [base_x];
+                    const vals_y: number[] = [base_y];
+
+                    for (let i = 0; i < vals_x.length; i++) {
+                        for (let x = Math.max(1, vals_x[i] - 1); x <= Math.min(vals_x[i] + 1, 6); x++) {
+                            for (let y = Math.max(1, vals_y[i] - 1); y <= Math.min(vals_y[i] + 1, 6); y++) {
+                                if (x === vals_x[i] && y === vals_y[i]) {
+                                    continue;
+                                }
+                                const code = `${x}${String.fromCharCode(64 + y)}`;
+                                if (grid[code]?.has_ship) {
+                                    let has: boolean = false;
+                                    for (let j = 0; j < vals_x.length; j++) {
+                                        if (x === vals_x[j] && y === vals_y[j]) {
+                                            has = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!has) {
+                                        vals_x.push(x);
+                                        vals_y.push(y);
+                                    }
+                                    console.log("found ship at ", x, y, " code: ", code, " vals: ", vals_x, vals_y)
+                                }
+                            }
+                        }
+                    }
+                    let blockId: string;
+                    const num = vals_x.length;
+                    const used = (wasMyTurn)? opponentPlacedBlocks : myPlacedBlocks;
+                    const usedIds = used.current.map(x => x.blockId);
+                    if (num === 3) {
+                        blockId = "a";
+                    } else if (num === 2) {
+                        blockId = (usedIds.includes("b"))? "c" : "b";
+                    } else {
+                        if (!(usedIds.includes("d"))) {
+                            blockId = "d";
+                        } else if (!(usedIds.includes("e"))) {
+                            blockId = "e";
+                        } else {
+                            blockId = "f";
+                        }
+                    }
+                    console.log("used", usedIds, "blockId", blockId)
+                    const rotation = (num == 1)? 0 : ((Math.max(...vals_x) === Math.min(...vals_x))? 1 : 0);
+                    const start_x = Math.min(...vals_x);
+                    const start_y = Math.min(...vals_y);
+
+
+                    const ship: PlacedBlock = {blockId: blockId, rot: rotation, col: start_x - 1, row: start_y - 1};
+                    used.current.push(ship);
+
+                    console.log("SUNK", vals_x, vals_y);
+
+
+                }
+
             }
 
             // TODO: add events log from event and cell
@@ -325,7 +395,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
 
     return (
-        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot, opponentPlacedBlocks, myPlacedBlocks}}>
             {children}
         </AppContext.Provider>
     )
@@ -347,6 +417,8 @@ interface AppContextType {
     opponentGrid: Grid;
     sendShoot: (col: number, row: number) => void;
     lastShot: RefObject<LastShot | null> ;
+    opponentPlacedBlocks: RefObject<PlacedBlock[]>;
+    myPlacedBlocks: RefObject<PlacedBlock[]>;
 }
 
 export function useAppContext(): AppContextType{
