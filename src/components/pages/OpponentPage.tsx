@@ -3,11 +3,13 @@ import './GamePage.css';
 import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
 import {useAppContext} from "../AppContext.tsx";
+import {useNavigate} from "react-router-dom";
 
 
 
 export default function OpponentPage(){
     const context = useAppContext();
+    const navigate = useNavigate();
 
     return (
         <div className={"game-container"}>
@@ -21,7 +23,7 @@ export default function OpponentPage(){
             {/*</div>*/}
 
             <GridStatic active={false} gridData={context.ownGrid} blocks={context.ownBlocks} haloBlocks={context.myPlacedBlocks.current}/>
-            <div className={"game-card-wrapper"}>
+            <div className={"game-card-wrapper"} onClick={() => navigate("/log")}>
                 <TornCard>
                     <div className={"game-notification-card"}>
                         <div className={"game-notification-message"}>

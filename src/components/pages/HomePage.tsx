@@ -36,7 +36,7 @@ export default function HomePage() {
                     </TornCard>
                 </button>
             </div>
-            <button onClick={() => context.sendPING()}>
+            <button onClick={() => {}}>
             <div>
                 <hr/>
                 <img src={statsIcon} alt="stats"/>

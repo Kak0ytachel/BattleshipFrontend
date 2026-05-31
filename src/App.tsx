@@ -17,6 +17,8 @@ import OpponentPage from "./components/pages/OpponentPage.tsx";
 import SwipeLayout from "./components/ui/SwipeLayout.tsx";
 import PopupPage from "./components/pages/PopupPage.tsx";
 import AppContextProvider from "./components/AppContext.tsx";
+import EndGamePage from "./components/pages/EndGamePage.tsx";
+import LogPage from "./components/pages/LogPage.tsx";
 
 const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
@@ -47,6 +49,8 @@ function App() {
                 <Link to="/game">Game</Link>
                 <Link to="/opponent">Opp</Link>
                 <Link to="/popup">Popup</Link>
+                <Link to="/endgame">Endgame</Link>
+                <Link to="/log">Log</Link>
 
                 {/* Or navigate programmatically via functions */}
                 <button onClick={() => navigate('/contact')}>Contact</button>
@@ -77,6 +81,8 @@ function App() {
                     <Route path="/wait" element={<WaitPage />} />
                     <Route path="/name" element={<NamePage/>} />
                     <Route path="/popup" element={<PopupPage/>} />
+                    <Route path="/endgame" element={<EndGamePage/>} />
+                    <Route path="/log" element={<LogPage/>} />
                 </Routes>
             </AppContextProvider>
         </MemoryRouter>

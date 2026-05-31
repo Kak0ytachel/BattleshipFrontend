@@ -58,11 +58,15 @@
 }
 
 .game-notification-message {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 300;
     text-align: center;
     font-family: "Rowdies", sans-serif;
     color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
 }
 
 .game-notification-dot {
@@ -145,7 +149,10 @@
 }
 
 .game-card-wrapper {
-    margin: 10px;
+    margin-block: 10px;
+    margin-inline: 20px;
+    cursor: pointer;
+
 }
 
 .opponent-game-container {

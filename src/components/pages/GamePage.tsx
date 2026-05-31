@@ -2,19 +2,17 @@ import './GamePage.css';
 import {type JSX, useEffect, useState} from "react";
 import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
-import {type LastShot, useAppContext} from "../AppContext.tsx";
+import {type LastShot, type LogItem, useAppContext} from "../AppContext.tsx";
 import QuestionPopup from "../ui/QuestionPopup.tsx";
 import {cellLabel} from "../ui/GridDnd.tsx";
 import AnswerPopup from "../ui/AnswerPopup.tsx";
+import {useNavigate} from "react-router-dom";
 
 function Timer({initialTime = 90, onFinish = () => {}}) {
     const [time, setTime] = useState(initialTime);
     // const [intervalId, setIntervalId] = useState(0);
-
-
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -32,6 +30,40 @@ function Timer({initialTime = 90, onFinish = () => {}}) {
     return (
         <div className={"timer"}>
             {minutes}:{seconds < 10 ? '0' : ''}{seconds}
+        </div>
+    )
+}
+
+function LogCard() {
+    const navigate = useNavigate();
+    const context = useAppContext();
+
+    const messages: LogItem[] = [...context.logs.current];
+    while (messages.length < 2) {
+        messages.push({type: "HELP", color: "gray", text: "Kliknij tutaj, aby otworzyć", time: 0});
+    }
+
+    // const maxLength = 50;
+    // function cutText(text: string) {
+    //     text.slice(0, 100);
+    // }
+
+    return (
+        <div className={"game-card-wrapper"} onClick={() => navigate("/log")}>
+            <TornCard width={350}>
+                <div className={"game-notification-card"}>
+                    <div className={"game-notification-message"}>
+                        <span className={`game-notification-dot game-notification-dot-${messages[0].color}`}/>
+                        {messages[0].text}
+
+                    </div>
+                    <hr className={"very-short-hr"}/>
+                    <div className={"game-notification-message"}>
+                        <span className={`game-notification-dot game-notification-dot-${messages[1].color}`}/>
+                        {messages[1].text}
+                    </div>
+                </div>
+            </TornCard>
         </div>
     )
 }
@@ -57,6 +89,8 @@ export default function GamePage(){
     const [showQuestionPopup, setShowQuestionPopup] = useState(false);
     const [questionNumber, setQuestionNumber] = useState(0);
     const [showAnswerPopup, setShowAnswerPopup] = useState(false);
+
+    const navigate = useNavigate();
 
     function showQuestion() {
         const qn = context.getQuestion();
@@ -119,22 +153,7 @@ export default function GamePage(){
             </div>
 
             <GridStatic gridData={context.opponentGrid} turn={context.myTurn.current} onShoot={shoot} blocks={context.opponentPlacedBlocks.current}/>
-            <div className={"game-card-wrapper"}>
-            <TornCard>
-                <div className={"game-notification-card"}>
-                    <div className={"game-notification-message"}>
-                        <span className={"game-notification-dot game-notification-dot-red"}/>
-                        Przeciwnik trafil w twoj statek na B5!
-
-                    </div>
-                    <hr className={"very-short-hr"}/>
-                    <div className={"game-notification-message"}>
-                        <span className={"game-notification-dot game-notification-dot-gray"}/>
-                        Pomylileś, gdy strzelales w A3!
-                    </div>
-                </div>
-            </TornCard>
-            </div>
+            <LogCard/>
             <div className={"game-buttons-container"}>
                 <button className={"game-button"} onClick={() => showQuestion()}>
                     <img src={"src/assets/game-bullet-add.svg"} alt={"add-bullet"}/>

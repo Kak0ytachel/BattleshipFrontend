@@ -41,6 +41,7 @@ type Grid = {[key: string]: {is_shot: boolean, has_ship: boolean, attempted: boo
 export type LastShot = {questionIndex: number, answer: string, correct: string}
 type ShotPayload = {current_turn: number, next_turn: number, grid: Grid, event: string, cell: string,
     question?: number, correct?: string, answer?: string, result?: string}
+export type LogItem = {type: string, text: string, color: string, time: number}
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
@@ -59,6 +60,10 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const lastShot = useRef<LastShot | null>(null);
     const myPlacedBlocks = useRef<PlacedBlock[]>([]);
     const opponentPlacedBlocks = useRef<PlacedBlock[]>([]);
+
+
+    const logs = useRef<LogItem[]>([]);
+    const victory = useRef<boolean | null>(null);
 
     const navigate = useNavigate();
 
@@ -105,6 +110,8 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         "PLACE-DONE": async (websocket, payload) => {
             navigate('/game');
             requestQuestions();
+            // eslint-disable-next-line react-hooks/purity
+            logs.current = [{type: "START", text: "Zaczęto grę", color: "marine", time: Math.floor(Number(Date.now()) / 1000)}];
         },
         "QUESTIONS-SEND": async (websocket, payload) => {
             const questions = (payload as {questions: number[]}).questions;
@@ -129,6 +136,46 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 window.dispatchEvent(new CustomEvent('SHOW-ANSWER'));
             } else {
                 setOwnGrid(payload.grid);// prev opponent turn, my grid
+            }
+            const cell = payload.cell as string;
+            console.log("payload.result ", payload.result, "wasMyTurn ", wasMyTurn);
+            const text = (() => {
+                if (wasMyTurn) {
+                    switch (payload.result) {
+                        case "SUNK":
+                            return `Zatopiłeś statek przeciwnika w polu ${cell}`;
+                        case "HIT":
+                            return `Trafiłeś w statek przeciwnika w polu ${cell}`;
+                        case "EMPTY":
+                            return `Nie trafiłeś w statek przeciwnika w polu ${cell}`;
+                        case "MISTAKE":
+                            return `Popełniłeś błąd, strzelając w pole ${cell}`;
+                    }
+                } else {
+                    switch (payload.result) {
+                        case "SUNK":
+                            return `Przeciwnik zatopił twój statek w polu ${cell}`;
+                        case "HIT":
+                            return `Przeciwnik trafił w twój statek w polu ${cell}`;
+                        case "EMPTY":
+                            return `Przeciwnik nie trafił w twój statek w polu ${cell}`;
+                        case "MISTAKE":
+                            return `Przeciwnik popełnił błąd, strzelając w pole ${cell}`;
+                    }
+                }
+                return "ERROR";
+            }) ();
+            console.log("text", text);
+
+            let color: string;
+            if (payload.result == "SUNK" || payload.result == "HIT") {
+                color = (wasMyTurn)? "green" : "red";
+            } else {
+                color = "gray";
+            }
+
+            if (payload.event != "START") {
+                logs.current = [{type: payload.event, text: text, color: color, time: Math.floor(Number(Date.now()) / 1000)}, ...logs.current];
             }
 
             if (payload.event == "SHOOT") {
@@ -395,7 +442,9 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
 
     return (
-        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips, getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot, opponentPlacedBlocks, myPlacedBlocks}}>
+        <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips,
+            getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
+            opponentPlacedBlocks, myPlacedBlocks, victory, logs}}>
             {children}
         </AppContext.Provider>
     )
@@ -419,6 +468,8 @@ interface AppContextType {
     lastShot: RefObject<LastShot | null> ;
     opponentPlacedBlocks: RefObject<PlacedBlock[]>;
     myPlacedBlocks: RefObject<PlacedBlock[]>;
+    victory: RefObject<boolean | null>;
+    logs: RefObject<LogItem[]>;
 }
 
 export function useAppContext(): AppContextType{
