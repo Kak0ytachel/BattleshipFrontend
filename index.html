@@ -12,5 +12,13 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.addEventListener('beforeunload', function (e) {
+        // Отменяет стандартное поведение и вызывает окно подтверждения
+        e.preventDefault();
+        // Необходимая строка для поддержки большинства старых браузеров
+        e.returnValue = '';
+      });
+    </script>
   </body>
 </html>

@@ -89,7 +89,7 @@ export default function OtpInput ({ length = 6, onComplete = null }: OtpInputPro
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     onPaste={handlePaste}
                     maxLength={1}
-                    inputMode="numeric"
+                    inputMode="text"
                     pattern="[0-9]*"
                     className="code-input"
                 />
