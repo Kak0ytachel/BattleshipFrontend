@@ -82,6 +82,10 @@
     background-color: #E42E2E;
 }
 
+.game-notification-dot-green {
+    background-color: var(--dot-green-color);
+}
+
 .game-notification-dot-gray {
     background-color: #B3B3B3;
 }

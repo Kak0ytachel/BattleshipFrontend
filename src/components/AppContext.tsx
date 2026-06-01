@@ -4,8 +4,8 @@ import {jwtDecode} from "jwt-decode";
 import {useNavigate} from "react-router-dom";
 import {type BlockCoords, cellLabel} from "./ui/GridDnd.tsx";
 import type {PlacedBlock} from "./ui/GridStatic.tsx";
+import {BASE_URL, BASE_URL_WS} from "../App.tsx";
 // import {Link, MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
-
 
 async function wait(ms: number) {
     await new Promise(resolve => setTimeout(resolve, ms));
@@ -40,8 +40,9 @@ type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 type Grid = {[key: string]: {is_shot: boolean, has_ship: boolean, attempted: boolean}}
 export type LastShot = {questionIndex: number, answer: string, correct: string}
 type ShotPayload = {current_turn: number, next_turn: number, grid: Grid, event: string, cell: string,
-    question?: number, correct?: string, answer?: string, result?: string}
-export type LogItem = {type: string, text: string, color: string, time: number}
+    question?: number, correct?: string, answer?: string, result?: string};
+export type LogItem = {type: string, text: string, color: string, time: number};
+export type EndGameStats = {correct_answers: number, wrong_answers: number, bombs_placed: number}
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
@@ -64,6 +65,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
     const logs = useRef<LogItem[]>([]);
     const victory = useRef<boolean | null>(null);
+    const endGameStats = useRef<EndGameStats | null>(null);
 
     const navigate = useNavigate();
 
@@ -248,12 +250,19 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
             // TODO: add events log from event and cell
         },
+        "END-GAME": async (websocket, payload) => {
+            const winner_id = (payload as {winner: number, stats: Record<string, EndGameStats>}).winner;
+            victory.current = (winner_id === userIdRef.current);
+            const allStats = (payload as {winner: number, stats: Record<string, EndGameStats>}).stats;
+            endGameStats.current = allStats[String(userIdRef.current)];
+            navigate('/endgame');
+        }
     }
 
     async function connect_websocket() {
         await check_refresh_token();
         const token = tokenManager.getToken();
-        const auth_url = "http://localhost:3000/websocket-auth" + (token ? `?token=${token}` : "");
+        const auth_url = BASE_URL + "/websocket-auth" + (token ? `?token=${token}` : "");
         const result = await fetch(auth_url, {
             headers: {Authorization: `Bearer ${token}`}
         });
@@ -265,7 +274,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             return;
         }
 
-        const ws_ = new WebSocket('ws://localhost:3000/websocket' + (ticket ? `?ticket=${ticket}` : ""))
+        const ws_ = new WebSocket(BASE_URL_WS + '/websocket' + (ticket ? `?ticket=${ticket}` : ""))
         const ws = ws_ as WebSocket & { send_handle: typeof send_handle };
         ws.send_handle = send_handle;
 
@@ -300,7 +309,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             return;
         }
 
-        const refresh_url = "http://localhost:3000/update-token";
+        const refresh_url = BASE_URL + "/update-token";
         const result = await fetch(refresh_url, {
             headers: {Authorization: `Bearer ${tokenManager.getRefreshToken()}`}
         })
@@ -342,7 +351,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     }
 
     async function createUser(name: string) {
-        const base_url = 'http://localhost:3000/create-user';
+        const base_url = BASE_URL + '/create-user';
         const params = new URLSearchParams({name});
         const url = (name.length > 0)? `${base_url}?${params}` : base_url;
         const result = await fetch(url, {});
@@ -444,7 +453,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     return (
         <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips,
             getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
-            opponentPlacedBlocks, myPlacedBlocks, victory, logs}}>
+            opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats}}>
             {children}
         </AppContext.Provider>
     )
@@ -470,6 +479,7 @@ interface AppContextType {
     myPlacedBlocks: RefObject<PlacedBlock[]>;
     victory: RefObject<boolean | null>;
     logs: RefObject<LogItem[]>;
+    endGameStats: RefObject<EndGameStats | null>;
 }
 
 export function useAppContext(): AppContextType{

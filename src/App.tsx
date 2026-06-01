@@ -24,6 +24,9 @@ const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
 const Contact = () => <GridStatic/>;
 
+export const BASE_URL = "http://localhost:3000";
+export const BASE_URL_WS = "ws://localhost:3000";
+// 192.168.137.1
 
 function App() {
 
@@ -50,7 +53,7 @@ function App() {
                 <Link to="/opponent">Opp</Link>
                 <Link to="/popup">Popup</Link>
                 <Link to="/endgame">Endgame</Link>
-                <Link to="/log">Log</Link>
+                <Link to="/logs">Log</Link>
 
                 {/* Or navigate programmatically via functions */}
                 <button onClick={() => navigate('/contact')}>Contact</button>
