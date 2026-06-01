@@ -1,17 +1,27 @@
-import {createContext, type ReactNode, type Ref, type RefObject, useContext, useEffect, useRef, useState} from "react";
+import {
+    createContext,
+    type Dispatch,
+    type ReactNode,
+    type Ref,
+    type RefObject, type SetStateAction,
+    useContext,
+    useEffect,
+    useRef,
+    useState
+} from "react";
 import {useLocalStorage} from "usehooks-ts";
 import {jwtDecode} from "jwt-decode";
 import {useNavigate} from "react-router-dom";
 import {type BlockCoords, cellLabel} from "./ui/GridDnd.tsx";
 import type {PlacedBlock} from "./ui/GridStatic.tsx";
-import {BASE_URL, BASE_URL_WS} from "../App.tsx";
+import App, {BASE_URL, BASE_URL_WS} from "../App.tsx";
 // import {Link, MemoryRouter, Route, Routes, useNavigate} from "react-router-dom";
 
 async function wait(ms: number) {
     await new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const AppContext = createContext(null);
+const AppContext = createContext<AppContextType | null>(null);
 
 function send_handle(this: WebSocket, type: string, payload: object) {
     this.send(JSON.stringify({
@@ -66,6 +76,9 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const logs = useRef<LogItem[]>([]);
     const victory = useRef<boolean | null>(null);
     const endGameStats = useRef<EndGameStats | null>(null);
+
+    const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
+    const [snackbarText, setSnackbarText] = useState<string>("");
 
     const navigate = useNavigate();
 
@@ -453,7 +466,8 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     return (
         <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips,
             getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
-            opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats}}>
+            opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats, showSnackbar, setShowSnackbar,
+            snackbarText, setSnackbarText}}>
             {children}
         </AppContext.Provider>
     )
@@ -480,6 +494,10 @@ interface AppContextType {
     victory: RefObject<boolean | null>;
     logs: RefObject<LogItem[]>;
     endGameStats: RefObject<EndGameStats | null>;
+    showSnackbar: boolean
+    setShowSnackbar: Dispatch<SetStateAction<boolean>>;
+    snackbarText: string;
+    setSnackbarText: Dispatch<SetStateAction<string>>;
 }
 
 export function useAppContext(): AppContextType{

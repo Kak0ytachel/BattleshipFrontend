@@ -107,12 +107,14 @@ export default function GamePage(){
     function shoot(e: MouseEvent, col: number, row: number) {
         console.log(col, row, cellLabel(col, row))
         if (!context.myTurn.current) {
+            context.setSnackbarText("Nie twoja kolej!");
+            context.setShowSnackbar(true);
             console.log("not my turn");
-            // TODO: add message
             return;
         }
         if (context.answers.length <= 0) {
-            // TODO: add message
+            context.setSnackbarText("Nie masz strzałów!");
+            context.setShowSnackbar(true);
             console.log("no answers");
             return;
         }

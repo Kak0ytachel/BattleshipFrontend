@@ -1,0 +1,49 @@
+.snackbar {
+    z-index: 80;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    opacity: 0;
+    scale: 0.9;
+    display: none;
+
+    /* CRITICAL: transition the display property with allow-discrete */
+    transition:
+            opacity 0.3s ease,
+            scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            display 0.3s ease allow-discrete;
+}
+
+.snackbar--visible {
+    display: block;
+    opacity: 1;
+    scale: 1;
+
+    @starting-style {
+        opacity: 0;
+        scale: 0.9;
+    }
+}
+
+.snackbar-text {
+    font-family: "Rowdies", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 10px;
+    display: inline-block;
+}
+
+@keyframes snackbar-entrance {
+    0% {
+        opacity: 0;
+        filter: blur(4px);
+        scale: 0.92;
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        scale: 1;
+    }
+}

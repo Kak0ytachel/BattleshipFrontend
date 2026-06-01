@@ -16,9 +16,10 @@ import GamePage from "./components/pages/GamePage.tsx";
 import OpponentPage from "./components/pages/OpponentPage.tsx";
 import SwipeLayout from "./components/ui/SwipeLayout.tsx";
 import PopupPage from "./components/pages/PopupPage.tsx";
-import AppContextProvider from "./components/AppContext.tsx";
+import AppContextProvider, {useAppContext} from "./components/AppContext.tsx";
 import EndGamePage from "./components/pages/EndGamePage.tsx";
 import LogPage from "./components/pages/LogPage.tsx";
+import SnackBar from "./components/ui/SnackBar.tsx";
 
 const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
@@ -35,7 +36,7 @@ function App() {
 
     function Navigation() {
         const navigate = useNavigate();
-
+        const context = useAppContext();
         return (
             <nav className="navbar">
                 {/* You can use standard Links */}
@@ -56,8 +57,10 @@ function App() {
                 <Link to="/logs">Log</Link>
 
                 {/* Or navigate programmatically via functions */}
-                <button onClick={() => navigate('/contact')}>Contact</button>
+                <button onClick={() => console.log(context.showSnackbar)}>Contact</button>
+                <SnackBar show={context.showSnackbar} text={context.snackbarText} duration={2} onHide={() => context.setShowSnackbar(false)}/>
             </nav>
+
         );
     }
     return (
