@@ -1,0 +1,57 @@
+
+.speech-input-radio {
+    display: inline-block;
+    height: 45px;
+    width: 45px;
+    margin: 5px;
+    appearance: none;
+    border-radius: 50%;
+    border: 3px solid var(--marine-color);
+    outline: none;
+    cursor: pointer;
+}
+
+.speech-input-radio::before{
+    content: attr(value);
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    font-size: 20px;
+    font-family: "Rowdies", sans-serif;
+    font-weight: 400;
+    accent-color: transparent;
+    outline: none;
+}
+
+.speech-input-radio:checked {
+    background-color: rgb(0 0 0 / 0.2);
+    border-color: var(--marine-color);
+    /*accent-color: green;*/
+    /*outline: none;*/
+    /*border-width: 1px;*/
+    background-clip: content-box;
+}
+
+.speech-input-radio:checked::before {
+    /*color: white;*/
+}
+
+.speech-input-radio:active {
+
+    background-color: rgb(0 0 0 / 0.35);
+    /*background-color: green;*/
+    /*accent-color: green;*/
+    /*border: none;*/
+    /*appearance: none;*/
+}
+
+.speech-input-radio:focus {
+    /*accent-color: transparent;*/
+    /*background-color: green;*/
+    /*accent-color: green;*/
+    /*outline: none;*/
+    /*border: none;*/
+    /*appearance: none;*/
+}

@@ -25,44 +25,43 @@ const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
 const Contact = () => <GridStatic/>;
 
-export const BASE_URL = "http://localhost:3000";
-export const BASE_URL_WS = "ws://localhost:3000";
+export const BASE_URL = "http://192.168.137.1:3000";
+export const BASE_URL_WS = "ws://192.168.137.1:3000";
 // 192.168.137.1
+
+function Navigation() {
+    const navigate = useNavigate();
+    const context = useAppContext();
+    return (
+        <nav className="navbar">
+            {/* You can use standard Links */}
+            <Link to="/">Home</Link>
+            <Link to="/about">About</Link>
+            <Link to="/test">Test</Link>
+            <Link to="/home">home</Link>
+            <Link to="/join">Join</Link>
+            <Link to="/create">Create</Link>
+            <br/>
+            <Link to="/place">Place</Link>
+            <Link to="/wait">Wait</Link>
+            <Link to="/name">Name</Link>
+            <Link to="/game">Game</Link>
+            <Link to="/opponent">Opp</Link>
+            <Link to="/popup">Popup</Link>
+            <Link to="/endgame">Endgame</Link>
+            <Link to="/logs">Log</Link>
+
+            {/* Or navigate programmatically via functions */}
+            <button onClick={() => console.log(context.showSnackbar)}>Contact</button>
+            <SnackBar show={context.showSnackbar} text={context.snackbarText} duration={2} onHide={() => context.setShowSnackbar(false)}/>
+        </nav>
+
+    );
+}
 
 function App() {
 
 
-    // )
-
-    function Navigation() {
-        const navigate = useNavigate();
-        const context = useAppContext();
-        return (
-            <nav className="navbar">
-                {/* You can use standard Links */}
-                <Link to="/">Home</Link>
-                <Link to="/about">About</Link>
-                <Link to="/test">Test</Link>
-                <Link to="/home">home</Link>
-                <Link to="/join">Join</Link>
-                <Link to="/create">Create</Link>
-                <br/>
-                <Link to="/place">Place</Link>
-                <Link to="/wait">Wait</Link>
-                <Link to="/name">Name</Link>
-                <Link to="/game">Game</Link>
-                <Link to="/opponent">Opp</Link>
-                <Link to="/popup">Popup</Link>
-                <Link to="/endgame">Endgame</Link>
-                <Link to="/logs">Log</Link>
-
-                {/* Or navigate programmatically via functions */}
-                <button onClick={() => console.log(context.showSnackbar)}>Contact</button>
-                <SnackBar show={context.showSnackbar} text={context.snackbarText} duration={2} onHide={() => context.setShowSnackbar(false)}/>
-            </nav>
-
-        );
-    }
     return (
         <MemoryRouter initialEntries={['/multiplayer']}>
             <AppContextProvider>

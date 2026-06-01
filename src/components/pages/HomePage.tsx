@@ -23,7 +23,7 @@ export default function HomePage() {
                     </TornCard>
                     <div className={"home-soon-helper"}>
                         <div className={"home-soon-container"}>
-                            <span className={"home-soon"}>Wkrotce</span>
+                            <span className={"home-soon"}>Wkrótce</span>
                         </div>
                     </div>
 
