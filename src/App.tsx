@@ -22,6 +22,7 @@ import LogPage from "./components/pages/LogPage.tsx";
 import SnackBar from "./components/ui/SnackBar.tsx";
 import SpeechPopup from "./components/ui/SpeechPopup.tsx";
 import ActiveGamePopup from "./components/ui/ActiveGamePopup.tsx";
+import StatsPage from "./components/pages/StatsPage.tsx";
 
 const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
@@ -51,7 +52,8 @@ function Navigation() {
             <Link to="/opponent">Opp</Link>
             <Link to="/popup">Popup</Link>
             <Link to="/endgame">Endgame</Link>
-            <Link to="/logs">Log</Link>
+            <Link to="/log">Log</Link>
+            <Link to="/stats">Stats</Link>
 
             {/* Or navigate programmatically via functions */}
             <button onClick={() => console.log(context.showSnackbar)}>Contact</button>
@@ -92,6 +94,7 @@ function App() {
                     <Route path="/popup" element={<PopupPage/>} />
                     <Route path="/endgame" element={<EndGamePage/>} />
                     <Route path="/log" element={<LogPage/>} />
+                    <Route path="/stats" element={<StatsPage/>} />
                 </Routes>
             </AppContextProvider>
         </MemoryRouter>

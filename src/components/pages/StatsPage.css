@@ -1,0 +1,100 @@
+.stats-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-grow: 1;
+}
+
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.stats-back-helper {
+    position: relative;
+    right: 10px;
+    height: 10px;
+    width: 0;
+    top: 0;
+    align-self: start;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto auto auto;
+    border: 3px solid var(--light-blue-color);
+    border-radius: 8px;
+    /*max-width: 500px;*/
+    /*margin-inline: 20px;*/
+    margin-block: 30px;
+    font-family: "Rowdies", sans-serif;
+    text-align: left;
+    color: var(--text-color);
+    align-items: center;
+    min-width: 300px;
+    padding: 50px;
+}
+
+.stats-grid-header {
+    margin-inline: 12px;
+    margin-block: 20px;
+
+}
+
+.stats-grid-cell {
+    padding-inline: 12px;
+    padding-block: 10px;
+    border-block: 4px solid var(--light-blue-color);
+    margin: -2px;
+}
+
+:nth-child(8n-7 of .stats-grid-cell) {
+    border-left: 4px solid var(--light-blue-color);
+    /*border-left: 10px;*/
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    /*background-color: red;*/
+    /*height: 200px;*/
+}
+
+:nth-child(8n of .stats-grid-cell) {
+    border-right: 4px solid var(--light-blue-color);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.stats-helper{
+    /*font-size: 12px;*/
+    /*color: #64748b;*/
+    margin: 10px;
+    letter-spacing: 0.05em;
+    white-space: pre-wrap;
+    color: #939FB1;
+    font-family: "Rowdies", sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.stats-hidden {
+    opacity: 0;
+}
+
+.stats-hidden-appear {
+    animation: fadeInOut 2s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1; /* Fully visible at 0.5s */
+    }
+    100% {
+        opacity: 0; /* Hidden again at 1s */
+    }
+}

@@ -53,6 +53,8 @@ type ShotPayload = {current_turn: number, next_turn: number, grid: Grid, event: 
     question?: number, correct?: string, answer?: string, result?: string, cells: string[], };
 export type LogItem = {type: string, text: string, color: string, time: number};
 export type EndGameStats = {correct_answers: number, wrong_answers: number, bombs_placed: number}
+export type StatsRow = {user_id: number, name: string, games_won: number, games_lost: number, correct_answers: number,
+    wrong_answers: number, winrate?: number, correct_percentage?: number}
 
 export default function AppContextProvider({ children }: {children: ReactNode}) {
 
@@ -87,6 +89,8 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const [isMySpeech, setIsMySpeech] = useState<boolean>(false);
     const [isBombing, setIsBombing] = useState<boolean>(false);
     const [showActiveGamePopup, setShowActiveGamePopup] = useState<boolean>(false);
+    const [stats, setStats] = useState<StatsRow[]>([]);
+    const sortByGames = useRef<boolean>(true);
 
     const navigate = useNavigate();
 
@@ -428,10 +432,51 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         "TERMINATE-DONE": async (websocket, payload) => {
             setSnackbarText("Zakończono grę");
             setShowSnackbar(true);
+        },
+        "STATS-SEND": async (websocket, payload) => {
+            const current_stats = (payload as {"stats": StatsRow[]}).stats;
+            for (let i = 0; i < current_stats.length; i++) {
+                const won = current_stats[i].games_won;
+                const lost = current_stats[i].games_lost;
+                current_stats[i].winrate = (won + lost == 0)? 0: Math.floor(won / (won + lost) * 100);
+
+                const correct = current_stats[i].correct_answers;
+                const wrong = current_stats[i].wrong_answers;
+                current_stats[i].correct_percentage = (correct + wrong == 0) ? 0 : Math.floor(correct / (correct + wrong) * 100);
+            }
+            sortStats(current_stats);
+
         }
     }
 
-    async function endGame() {
+    function sortStats(_stats: StatsRow[] | null = null) {
+        const current_stats = _stats || [...stats];
+        if (sortByGames.current) {
+            console.log("sort a")
+            current_stats.sort((a: StatsRow, b: StatsRow) => {
+                return (b.winrate || 0) - (a.winrate || 0)
+                    || (b.games_won - a.games_won) || (a.games_lost - b.games_lost)}
+            );
+        } else {
+            console.log("sort b")
+            current_stats.sort((a: StatsRow, b: StatsRow) => {
+                return (b.correct_percentage || 0) - (a.correct_percentage || 0)
+                    || (b.correct_answers - a.correct_answers) || (a.wrong_answers - b.wrong_answers)}
+            );
+
+        }
+        setStats(current_stats);
+    }
+
+    function changeSort() {
+        sortByGames.current = !sortByGames.current;
+        console.log(sortByGames);
+        sortStats();
+
+
+    }
+
+    function endGame() {
         setShowActiveGamePopup(false);
         if (socketRef.current) {
             socketRef.current.send_handle("TERMINATE-GAME", {});
@@ -514,6 +559,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     }
 
     function sendPING() {
+        console.log(userId);
         if (socketRef.current) {
             socketRef.current.send_handle("PING", {});
         } else {
@@ -696,13 +742,22 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         // setIsMySpeech(false);
     }
 
+    function getStats() {
+        if (socketRef.current) {
+            socketRef.current.send_handle("STATS-GET", {});
+        } else {
+            console.log("ERROR: no socket connected");
+        }
+    }
+
+
 
     return (
         <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips,
             getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
             opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats, showSnackbar, setShowSnackbar,
             snackbarText, setSnackbarText, showSpeechPopup, sendSpeech, showSpeech, isMySpeech, isBombing, bomb,
-            speechTopic, showActiveGamePopup, endGame}}>
+            speechTopic, showActiveGamePopup, endGame, getStats, stats, changeSort}}>
             {children}
         </AppContext.Provider>
     )
@@ -742,6 +797,9 @@ interface AppContextType {
     speechTopic: number;
     showActiveGamePopup: boolean;
     endGame: () => void;
+    getStats: () => void;
+    stats: StatsRow[];
+    changeSort: () => void;
 }
 
 export function useAppContext(): AppContextType{
