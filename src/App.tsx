@@ -21,6 +21,7 @@ import EndGamePage from "./components/pages/EndGamePage.tsx";
 import LogPage from "./components/pages/LogPage.tsx";
 import SnackBar from "./components/ui/SnackBar.tsx";
 import SpeechPopup from "./components/ui/SpeechPopup.tsx";
+import ActiveGamePopup from "./components/ui/ActiveGamePopup.tsx";
 
 const Home = () => <h2>Home Page</h2>;
 const About = () => <h2>About Page</h2>;
@@ -56,6 +57,7 @@ function Navigation() {
             <button onClick={() => console.log(context.showSnackbar)}>Contact</button>
             <SnackBar show={context.showSnackbar} text={context.snackbarText} duration={2} onHide={() => context.setShowSnackbar(false)}/>
             <SpeechPopup show={context.showSpeech} onClick={(x) => context.sendSpeech(x)} self={context.isMySpeech} index={context.speechTopic}/>
+            <ActiveGamePopup show={context.showActiveGamePopup} onClick={() => context.endGame()}/>
         </nav>
 
     );

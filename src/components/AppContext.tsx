@@ -86,6 +86,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const speechGrade = useRef<number>(0);
     const [isMySpeech, setIsMySpeech] = useState<boolean>(false);
     const [isBombing, setIsBombing] = useState<boolean>(false);
+    const [showActiveGamePopup, setShowActiveGamePopup] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -112,6 +113,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         "HELLO": async (websocket, payload) => {
             await wait(1000);
             updateCode();
+            checkGame();
         },
         "JOIN-CODE": async (websocket, payload) => {
             // console.log('event fired');
@@ -394,6 +396,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 }
 
             }
+            // TODO: add events on turn skipping
 
             // TODO: add events log from event and cell
         },
@@ -413,6 +416,27 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         "BOMBING-READY": async (websocket, payload) => {
             myTurn.current = true;
             setIsBombing(true);
+        },
+        "GAME-INFO": async (websocket, payload) => {
+            const game_id = (payload as {game_id: number}).game_id;
+            const has_game = game_id !== -1;
+            console.log("has_game", has_game, game_id);
+            if (has_game) {
+                setShowActiveGamePopup(true);
+            }
+        },
+        "TERMINATE-DONE": async (websocket, payload) => {
+            setSnackbarText("Zakończono grę");
+            setShowSnackbar(true);
+        }
+    }
+
+    async function endGame() {
+        setShowActiveGamePopup(false);
+        if (socketRef.current) {
+            socketRef.current.send_handle("TERMINATE-GAME", {});
+        } else {
+            console.log("ERROR: no refresh token found");
         }
     }
 
@@ -479,6 +503,14 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         tokenManager.setToken(payload.token);
         tokenManager.setRefreshToken(payload.refresh_token);
 
+    }
+
+    function checkGame() {
+        if (socketRef.current) {
+            socketRef.current.send_handle("CHECK-GAME", {});
+        } else {
+            console.log("ERROR: no socket to connect");
+        }
     }
 
     function sendPING() {
@@ -670,7 +702,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
             opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats, showSnackbar, setShowSnackbar,
             snackbarText, setSnackbarText, showSpeechPopup, sendSpeech, showSpeech, isMySpeech, isBombing, bomb,
-            speechTopic}}>
+            speechTopic, showActiveGamePopup, endGame}}>
             {children}
         </AppContext.Provider>
     )
@@ -708,6 +740,8 @@ interface AppContextType {
     isBombing: boolean;
     bomb: (e: MouseEvent, col: number, row: number) => void;
     speechTopic: number;
+    showActiveGamePopup: boolean;
+    endGame: () => void;
 }
 
 export function useAppContext(): AppContextType{

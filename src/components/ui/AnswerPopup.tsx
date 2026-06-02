@@ -4,7 +4,7 @@ import "./QuestionPopup.css";
 import {useRef, useState} from "react";
 import {getQuestion} from "./QuestionPopup.tsx";
 
-const fuzzy_sets: string[][]  = [["l", "ł"], ["ł", "l", "l"]];
+const fuzzy_sets: string[][]  = [["l", "ł"], ["ł", "l", "l"]]; // TODO: add more
 
 function findMatchedIndices(str1: string, str2: string) {
 
