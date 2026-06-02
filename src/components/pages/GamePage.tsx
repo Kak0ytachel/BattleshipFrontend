@@ -106,6 +106,12 @@ export default function GamePage(){
 
     function shoot(e: MouseEvent, col: number, row: number) {
         console.log(col, row, cellLabel(col, row))
+        if (!context.myTurn.current && context.isMySpeech) {
+            context.setSnackbarText("Czekamy na odpowiedź przeciwnika");
+            context.setShowSnackbar(true);
+            console.log("not my turn");
+            return;
+        }
         if (!context.myTurn.current) {
             context.setSnackbarText("Nie twoja kolej!");
             context.setShowSnackbar(true);
@@ -154,14 +160,14 @@ export default function GamePage(){
                 <Bullets count={Math.min(5, context.answers.length)}/>
             </div>
 
-            <GridStatic gridData={context.opponentGrid} turn={context.myTurn.current} onShoot={shoot} blocks={context.opponentPlacedBlocks.current}/>
+            <GridStatic gridData={context.opponentGrid} turn={context.myTurn.current} onShoot={context.isBombing? context.bomb: shoot} blocks={context.opponentPlacedBlocks.current} bombing={context.isBombing}/>
             <LogCard/>
             <div className={"game-buttons-container"}>
                 <button className={"game-button"} onClick={() => showQuestion()}>
                     <img src={"src/assets/game-bullet-add.svg"} alt={"add-bullet"}/>
                     {"Zgromadź\nstrzał"}
                 </button>
-                <button className={"game-button"} onClick={() => console.log(context.ownGrid)}>
+                <button className={"game-button"} onClick={() => context.showSpeechPopup()}>
                     <img src={"src/assets/game-place-bomb.svg"} alt={"place-bomb"}/>
                     {"Umieść\nbomby"}
                 </button>

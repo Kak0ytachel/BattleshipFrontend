@@ -50,7 +50,7 @@ type WebSocketPlus =  WebSocket & { send_handle: typeof send_handle }
 type Grid = {[key: string]: {is_shot: boolean, has_ship: boolean, attempted: boolean}}
 export type LastShot = {questionIndex: number, answer: string, correct: string}
 type ShotPayload = {current_turn: number, next_turn: number, grid: Grid, event: string, cell: string,
-    question?: number, correct?: string, answer?: string, result?: string};
+    question?: number, correct?: string, answer?: string, result?: string, cells: string[], };
 export type LogItem = {type: string, text: string, color: string, time: number};
 export type EndGameStats = {correct_answers: number, wrong_answers: number, bombs_placed: number}
 
@@ -79,6 +79,13 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
     const [showSnackbar, setShowSnackbar] = useState<boolean>(false);
     const [snackbarText, setSnackbarText] = useState<string>("");
+
+    const [showSpeech, setShowSpeech] = useState<boolean>(false);
+    const [unusedSpeechTopics, setUnusedSpeechTopics] = useState< number[] > ([]);
+    const [speechTopic, setSpeechTopic] = useState<number>(0);
+    const speechGrade = useRef<number>(0);
+    const [isMySpeech, setIsMySpeech] = useState<boolean>(false);
+    const [isBombing, setIsBombing] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -125,6 +132,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         "PLACE-DONE": async (websocket, payload) => {
             navigate('/game');
             requestQuestions();
+            requestTopics();
             // eslint-disable-next-line react-hooks/purity
             logs.current = [{type: "START", text: "Zaczęto grę", color: "marine", time: Math.floor(Number(Date.now()) / 1000)}];
         },
@@ -132,6 +140,12 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             const questions = (payload as {questions: number[]}).questions;
             for (const question of questions) {
                 setUnusedQuestions(x => [...x, question]);
+            }
+        },
+        "TOPICS-SEND": async (websocket, payload) => {
+            const topics = (payload as {topics: number[]}).topics;
+            for (const topic of topics) {
+                setUnusedSpeechTopics(x => [...x, topic]);
             }
         },
         "TURN-INFO": async (websocket, payload_) => {
@@ -143,18 +157,21 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             myTurn.current = isMyNextTurn;
             if (wasMyTurn) {
                 setOpponentGrid(payload.grid); // prev my turn, their grid
+            } else {
+                setOwnGrid(payload.grid);// prev opponent turn, my grid
+            }
 
+            if (wasMyTurn && payload.event != "BOMB") {
                 const questionIndex = payload.question as number;
                 const answer = payload.answer as string;
                 const correct = payload.correct as string;
                 lastShot.current = {questionIndex, answer, correct};
                 window.dispatchEvent(new CustomEvent('SHOW-ANSWER'));
-            } else {
-                setOwnGrid(payload.grid);// prev opponent turn, my grid
             }
+
             const cell = payload.cell as string;
             console.log("payload.result ", payload.result, "wasMyTurn ", wasMyTurn);
-            const text = (() => {
+            let text = (() => {
                 if (wasMyTurn) {
                     switch (payload.result) {
                         case "SUNK":
@@ -189,7 +206,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 color = "gray";
             }
 
-            if (payload.event != "START") {
+            if (payload.event != "START" && payload.event != "BOMB") {
                 logs.current = [{type: payload.event, text: text, color: color, time: Math.floor(Number(Date.now()) / 1000)}, ...logs.current];
             }
 
@@ -261,6 +278,123 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
 
             }
 
+            if (payload.event == "BOMB") {
+                const shot_ships: string[] = [];
+                const shot_empty: string[] = [];
+
+                const grid = payload.grid;
+                console.log("grid", grid);
+                const cells = payload.cells;
+                for (const cell of cells) {
+                    console.log("cell", cell);
+                    if (grid[cell].has_ship) {
+                        shot_ships.push(cell);
+                    }
+                }
+                console.log("shot_ships", shot_ships);
+                console.log("shot_empty", shot_empty);
+
+                if (wasMyTurn) {
+                    if (shot_ships.length > 0) {
+                        color = "green";
+                        text = `Twoje bomby wybuchly na polach ${cells.join(", ")} i trafiły w statki przeciwnika`
+                    } else {
+                        color = "gray";
+                        text = `Twoje bomby wybuchly na polach ${shot_empty.join(", ")}, ale nie trafiły w statki przeciwnika`
+                    }
+                } else {
+                    if (shot_ships.length > 0) {
+                        color = "red";
+                        text = `Bomby przeciwnkia wybuchly na polach ${cells.join(", ")} i trafiły w twoje statki`
+                    } else {
+                        color = "gray";
+                        text = `Bomby przeciwnkia wybuchly na polach ${shot_empty.join(", ")}, ale nie trafiły w twoje statki`
+                    }
+                }
+
+                logs.current = [{type: payload.event, text: text, color: color, time: Math.floor(Number(Date.now()) / 1000)}, ...logs.current];
+                if (shot_ships.length == 0) {
+                    console.log("len 0, returning")
+                    return;
+                }
+                for (const coordinate of shot_ships) {
+                    console.log("starting for ", coordinate);
+                    const base_x: number = Number(coordinate.split("")[0]); // 1-based
+                    const base_y: number = Number(coordinate.charCodeAt(1) - 64); // 1-based
+                    const vals_x: number[] = [base_x];
+                    const vals_y: number[] = [base_y];
+                    let break_flag = false;
+
+                    for (let i = 0; i < vals_x.length && !break_flag; i++) {
+                        for (let x = Math.max(1, vals_x[i] - 1); x <= Math.min(vals_x[i] + 1, 6) && !break_flag; x++) {
+                            for (let y = Math.max(1, vals_y[i] - 1); y <= Math.min(vals_y[i] + 1, 6) && !break_flag; y++) {
+                                if (x === vals_x[i] && y === vals_y[i]) {
+                                    continue;
+                                }
+                                const code = `${x}${String.fromCharCode(64 + y)}`;
+                                if (!grid[code]?.is_shot && grid[code].has_ship) {
+                                    break_flag = true;
+                                    console.log("found not shot ship at ", code, " breaking");
+                                    console.log(code, grid[code]);
+                                    break;
+                                }
+                                if (grid[code]?.has_ship) {
+                                    let has: boolean = false;
+                                    for (let j = 0; j < vals_x.length; j++) {
+                                        if (x === vals_x[j] && y === vals_y[j]) {
+                                            has = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!has) {
+                                        vals_x.push(x);
+                                        vals_y.push(y);
+                                    }
+                                    console.log("found ship at ", x, y, " code: ", code, " vals: ", vals_x, vals_y)
+                                }
+                            }
+                        }
+                    }
+                    if (break_flag) {
+                        console.log("breaking flag");
+                        continue;
+                    }
+                    let blockId: string;
+                    const num = vals_x.length;
+                    const used = (wasMyTurn)? opponentPlacedBlocks : myPlacedBlocks;
+                    const usedIds = used.current.map(x => x.blockId);
+                    if (num === 3) {
+                        blockId = "a";
+                    } else if (num === 2) {
+                        blockId = (usedIds.includes("b"))? "c" : "b";
+                    } else {
+                        if (!(usedIds.includes("d"))) {
+                            blockId = "d";
+                        } else if (!(usedIds.includes("e"))) {
+                            blockId = "e";
+                        } else {
+                            blockId = "f";
+                        }
+                    }
+                    console.log("used", usedIds, "blockId", blockId)
+                    const rotation = (num == 1)? 0 : ((Math.max(...vals_x) === Math.min(...vals_x))? 1 : 0);
+                    const start_x = Math.min(...vals_x);
+                    const start_y = Math.min(...vals_y);
+
+                    const ind = used.current?.findIndex(block => block.col == start_x - 1 && block.row == start_y - 1);
+                    if (ind !== -1) {
+                        console.log("found ship with index: ", ind, used.current[ind]);
+                        continue;
+                    }
+                    console.log("adding ship")
+
+                    const ship: PlacedBlock = {blockId: blockId, rot: rotation, col: start_x - 1, row: start_y - 1};
+                    console.log(ship);
+                    used.current.push(ship);
+                }
+
+            }
+
             // TODO: add events log from event and cell
         },
         "END-GAME": async (websocket, payload) => {
@@ -269,6 +403,16 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             const allStats = (payload as {winner: number, stats: Record<string, EndGameStats>}).stats;
             endGameStats.current = allStats[String(userIdRef.current)];
             navigate('/endgame');
+        },
+        "REQUEST-RATE": async (websocket, payload) => {
+            const topic = (payload as {topic: number}).topic;
+            setSpeechTopic(topic);
+            setIsMySpeech(false);
+            setShowSpeech(true);
+        },
+        "BOMBING-READY": async (websocket, payload) => {
+            myTurn.current = true;
+            setIsBombing(true);
         }
     }
 
@@ -434,6 +578,13 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             console.log("ERROR: no socket connected");
         }
     }
+    function requestTopics() {
+        if (socketRef.current) {
+            socketRef.current.send_handle("TOPICS-GET", {});
+        } else {
+            console.log("ERROR: no socket connected");
+        }
+    }
 
     function getQuestion(): number {
         console.log("unused questions: ", unusedQuestions);
@@ -462,12 +613,64 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             .send_handle("SHOOT", {questionIndex: questionIndex, answer: answerText, coordinate: label})
     }
 
+    function showSpeechPopup() {
+        if (myTurn.current) {
+            if (isBombing) {
+                setSnackbarText("Już umieszczaj bombę!")
+                setShowSnackbar(true);
+                return;
+            }
+            setSpeechTopic(unusedSpeechTopics[0]);
+            (socketRef.current as WebSocketPlus).send_handle("REQUEST-BOMBING", {"topic": unusedSpeechTopics[0]});
+            setIsMySpeech(true);
+            setUnusedSpeechTopics(x => x.slice(1));
+            if (unusedSpeechTopics.length <= 1) {
+                requestTopics();
+            }
+            setShowSpeech(true);
+            myTurn.current = false;
+        } else {
+            setSnackbarText("Nie twoja kolej!")
+            setShowSnackbar(true);
+        }
+
+    }
+
+    function sendSpeech(grade: number) {
+        setShowSpeech(false);
+
+        if (isMySpeech) {
+            speechGrade.current = grade;
+        } else {
+            (socketRef.current as WebSocketPlus).send_handle("RATE-DONE", {"grade": grade});
+        }
+        // TODO
+    }
+
+    function bomb(e: MouseEvent, col: number, row: number) {
+        // TODO: implement
+        console.log("bomb", col, row);
+        const cell = cellLabel(col, row);
+        if (socketRef.current) {
+            console.log("bombing: ", cell, speechGrade.current);
+            socketRef.current.send_handle("BOMB", {"cell": cell, "grade": speechGrade.current});
+            // speechGrade.current = 0;
+            setIsMySpeech(false);
+            setIsBombing(false);
+        } else {
+            console.log("ERROR: no socket connected");
+        }
+        // setIsBombing(false);
+        // setIsMySpeech(false);
+    }
+
 
     return (
         <AppContext.Provider value={{lateInit, sendPING, ownGameCode, joinGame, setOwnBlocks, ownBlocks, placeShips,
             getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
             opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats, showSnackbar, setShowSnackbar,
-            snackbarText, setSnackbarText}}>
+            snackbarText, setSnackbarText, showSpeechPopup, sendSpeech, showSpeech, isMySpeech, isBombing, bomb,
+            speechTopic}}>
             {children}
         </AppContext.Provider>
     )
@@ -498,6 +701,13 @@ interface AppContextType {
     setShowSnackbar: Dispatch<SetStateAction<boolean>>;
     snackbarText: string;
     setSnackbarText: Dispatch<SetStateAction<string>>;
+    showSpeechPopup: () => void;
+    sendSpeech: (grade: number) => void;
+    showSpeech: boolean;
+    isMySpeech: boolean;
+    isBombing: boolean;
+    bomb: (e: MouseEvent, col: number, row: number) => void;
+    speechTopic: number;
 }
 
 export function useAppContext(): AppContextType{
