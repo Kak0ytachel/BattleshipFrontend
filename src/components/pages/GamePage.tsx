@@ -7,6 +7,7 @@ import QuestionPopup from "../ui/QuestionPopup.tsx";
 import {cellLabel} from "../ui/GridDnd.tsx";
 import AnswerPopup from "../ui/AnswerPopup.tsx";
 import {useNavigate} from "react-router-dom";
+import {usePreventUnload} from "../usePreventUnload.tsx";
 
 function Timer({initialTime = 90, onFinish = () => {}}) {
     const [time, setTime] = useState(initialTime);
@@ -91,6 +92,8 @@ export default function GamePage(){
     const [showAnswerPopup, setShowAnswerPopup] = useState(false);
 
     const navigate = useNavigate();
+
+    usePreventUnload();
 
     function showQuestion() {
         const qn = context.getQuestion();

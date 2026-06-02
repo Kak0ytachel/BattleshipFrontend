@@ -2,6 +2,7 @@ import exitIcon from "/src/assets/exit.svg";
 import "./LogPage.css";
 import {useAppContext} from "../AppContext.tsx";
 import {useNavigate} from "react-router-dom";
+import {usePreventUnload} from "../usePreventUnload.tsx";
 
 function GridItem({text, time, color, index}: {text: string, time: number | string, color: string, index: number}) {
 
@@ -29,6 +30,8 @@ function GridItem({text, time, color, index}: {text: string, time: number | stri
 export default function LogPage() {
     const context = useAppContext();
     const navigate = useNavigate();
+
+    usePreventUnload();
 
     const items = [];
     for (let i = 0; i < context.logs.current.length; i++) {

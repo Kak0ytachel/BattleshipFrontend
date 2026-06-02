@@ -44,6 +44,10 @@ export default function StatsPage({}) {
         return () => clearInterval(intervalId);
     }, [])
 
+    useEffect(() => {
+        context.getStats()
+    })
+
     const updateRef = useRef<HTMLDivElement>(null);
 
     function showUpdate() {

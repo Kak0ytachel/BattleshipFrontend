@@ -91,6 +91,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
     const [showActiveGamePopup, setShowActiveGamePopup] = useState<boolean>(false);
     const [stats, setStats] = useState<StatsRow[]>([]);
     const sortByGames = useRef<boolean>(true);
+    const [isTerminated, setIsTerminated] = useState(false);
 
     const navigate = useNavigate();
 
@@ -131,6 +132,8 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         },
         "START-GAME": async (websocket, payload) => {
             navigate('/place');
+            updateCode();
+            setIsTerminated(false);
         },
         "PLACE-WAIT": async (websocket, payload) => {
             navigate('/wait');
@@ -157,9 +160,10 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         "TURN-INFO": async (websocket, payload_) => {
             const payload = payload_ as ShotPayload;
             const user_id = userIdRef.current;
-            const wasMyTurn = (Number(payload.current_turn) === Number(user_id)); // previous
-            const isMyNextTurn = (Number(payload.next_turn) === Number(user_id)); // next
-            console.log("current", payload.current_turn, "next", payload.next_turn, "user_id", user_id, "isMyNextTurn", isMyNextTurn, "wasMyTurn", wasMyTurn)
+            console.log(userId, userIdRef);
+            const wasMyTurn = (Number(payload.current_turn) === Number(userId)); // previous
+            const isMyNextTurn = (Number(payload.next_turn) === Number(userId)); // next
+            console.log("current", payload.current_turn, "next", payload.next_turn, "user_id (ref)", user_id, "userId (state)", userId, "isMyNextTurn", isMyNextTurn, "wasMyTurn", wasMyTurn)
             myTurn.current = isMyNextTurn;
             if (wasMyTurn) {
                 setOpponentGrid(payload.grid); // prev my turn, their grid
@@ -409,7 +413,9 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             victory.current = (winner_id === userIdRef.current);
             const allStats = (payload as {winner: number, stats: Record<string, EndGameStats>}).stats;
             endGameStats.current = allStats[String(userIdRef.current)];
+            setIsTerminated(true);
             navigate('/endgame');
+            updateCode();
         },
         "REQUEST-RATE": async (websocket, payload) => {
             const topic = (payload as {topic: number}).topic;
@@ -757,7 +763,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             getQuestion, handleAnswer, myTurn, answers, ownGrid, opponentGrid, sendShoot, lastShot,
             opponentPlacedBlocks, myPlacedBlocks, victory, logs, endGameStats, showSnackbar, setShowSnackbar,
             snackbarText, setSnackbarText, showSpeechPopup, sendSpeech, showSpeech, isMySpeech, isBombing, bomb,
-            speechTopic, showActiveGamePopup, endGame, getStats, stats, changeSort}}>
+            speechTopic, showActiveGamePopup, endGame, getStats, stats, changeSort, isTerminated}}>
             {children}
         </AppContext.Provider>
     )
@@ -800,6 +806,7 @@ interface AppContextType {
     getStats: () => void;
     stats: StatsRow[];
     changeSort: () => void;
+    isTerminated: boolean;
 }
 
 export function useAppContext(): AppContextType{

@@ -4,12 +4,15 @@ import GridStatic from "../ui/GridStatic.tsx";
 import TornCard from "../ui/TornCard.tsx";
 import {useAppContext} from "../AppContext.tsx";
 import {useNavigate} from "react-router-dom";
+import {usePreventUnload} from "../usePreventUnload.tsx";
 
 
 
 export default function OpponentPage(){
     const context = useAppContext();
     const navigate = useNavigate();
+
+    usePreventUnload()
 
     return (
         <div className={"game-container"}>

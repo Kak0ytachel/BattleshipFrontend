@@ -4,12 +4,15 @@ import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {useAppContext} from "../AppContext.tsx";
 import type {PlacedBlock} from "../ui/GridStatic.tsx";
+import {usePreventUnload} from "../usePreventUnload.tsx";
 
 export default function PlacePage() {
     const navigate = useNavigate();
     const context = useAppContext();
 
     const [shipCells, setShipCells] = useState<string[]>([]);
+
+    usePreventUnload();
 
     function onPlaced(coords: BlockCoords[], placed: PlacedBlock[]) {
         console.log(placed);

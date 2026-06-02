@@ -23,9 +23,9 @@ export default function EndGamePage() {
     }
     return (
         <div className={"endgame-container"}>
-            <h1>{isVictory? "Zwycięstwo!": "Porażka"}</h1>
-            <img src={isVictory? victory_icon : defeat_icon} alt={isVictory? "victory": "defeat"}/>
-            <h3>{isVictory? "Wspaniała praca!": "Następnym razem się uda!"}</h3>
+            <h1>{(isVictory || context.isTerminated )? "Zwycięstwo!": "Porażka"}</h1>
+            <img src={(isVictory || context.isTerminated )? victory_icon : defeat_icon} alt={isVictory? "victory": "defeat"}/>
+            <h3>{context.isTerminated? "Przeciwnik opuścił grę": (isVictory? "Wspaniała praca!": "Następnym razem się uda!")}</h3>
             <div>
 
 
