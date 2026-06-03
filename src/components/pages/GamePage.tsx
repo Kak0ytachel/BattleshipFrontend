@@ -8,6 +8,8 @@ import {cellLabel} from "../ui/GridDnd.tsx";
 import AnswerPopup from "../ui/AnswerPopup.tsx";
 import {useNavigate} from "react-router-dom";
 import {usePreventUnload} from "../usePreventUnload.tsx";
+import bulletAddIcon from "../../../src/assets/game-bullet-add.svg";
+import placeBombIcon from "../../../src/assets/game-place-bomb.svg";
 
 function Timer({initialTime = 90, onFinish = () => {}}) {
     const [time, setTime] = useState(initialTime);
@@ -167,11 +169,11 @@ export default function GamePage(){
             <LogCard/>
             <div className={"game-buttons-container"}>
                 <button className={"game-button"} onClick={() => showQuestion()}>
-                    <img src={"src/assets/game-bullet-add.svg"} alt={"add-bullet"}/>
+                    <img src={bulletAddIcon} alt={"add-bullet"}/>
                     {"Zgromadź\nstrzał"}
                 </button>
                 <button className={"game-button"} onClick={() => context.showSpeechPopup()}>
-                    <img src={"src/assets/game-place-bomb.svg"} alt={"place-bomb"}/>
+                    <img src={placeBombIcon} alt={"place-bomb"}/>
                     {"Umieść\nbomby"}
                 </button>
             </div>
