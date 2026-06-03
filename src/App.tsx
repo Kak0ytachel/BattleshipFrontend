@@ -24,12 +24,11 @@ import SpeechPopup from "./components/ui/SpeechPopup.tsx";
 import ActiveGamePopup from "./components/ui/ActiveGamePopup.tsx";
 import StatsPage from "./components/pages/StatsPage.tsx";
 
-const Home = () => <h2>Home Page</h2>;
-const About = () => <h2>About Page</h2>;
-const Contact = () => <GridStatic/>;
 
-export const BASE_URL = "http://192.168.137.1:3000";
-export const BASE_URL_WS = "ws://192.168.137.1:3000";
+
+const core_url = "battleshipbackend-oot6.onrender.com"
+export const BASE_URL = "https://" + core_url;
+export const BASE_URL_WS = "wss://" + core_url;
 // 192.168.137.1
 
 function Navigation() {
@@ -38,25 +37,25 @@ function Navigation() {
     return (
         <nav className="navbar">
             {/* You can use standard Links */}
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-            <Link to="/test">Test</Link>
-            <Link to="/home">home</Link>
-            <Link to="/join">Join</Link>
-            <Link to="/create">Create</Link>
-            <br/>
-            <Link to="/place">Place</Link>
-            <Link to="/wait">Wait</Link>
-            <Link to="/name">Name</Link>
-            <Link to="/game">Game</Link>
-            <Link to="/opponent">Opp</Link>
-            <Link to="/popup">Popup</Link>
-            <Link to="/endgame">Endgame</Link>
-            <Link to="/log">Log</Link>
-            <Link to="/stats">Stats</Link>
+            {/*<Link to="/">Home</Link>*/}
+            {/*<Link to="/about">About</Link>*/}
+            {/*<Link to="/test">Test</Link>*/}
+            {/*<Link to="/home">home</Link>*/}
+            {/*<Link to="/join">Join</Link>*/}
+            {/*<Link to="/create">Create</Link>*/}
+            {/*<br/>*/}
+            {/*<Link to="/place">Place</Link>*/}
+            {/*<Link to="/wait">Wait</Link>*/}
+            {/*<Link to="/name">Name</Link>*/}
+            {/*<Link to="/game">Game</Link>*/}
+            {/*<Link to="/opponent">Opp</Link>*/}
+            {/*<Link to="/popup">Popup</Link>*/}
+            {/*<Link to="/endgame">Endgame</Link>*/}
+            {/*<Link to="/log">Log</Link>*/}
+            {/*<Link to="/stats">Stats</Link>*/}
 
             {/* Or navigate programmatically via functions */}
-            <button onClick={() => console.log(context.showSnackbar)}>Contact</button>
+            {/*<button onClick={() => console.log(context.showSnackbar)}>Contact</button>*/}
             <SnackBar show={context.showSnackbar} text={context.snackbarText} duration={2} onHide={() => context.setShowSnackbar(false)}/>
             <SpeechPopup show={context.showSpeech} onClick={(x) => context.sendSpeech(x)} self={context.isMySpeech} index={context.speechTopic}/>
             <ActiveGamePopup show={context.showActiveGamePopup} onClick={() => context.endGame()}/>
@@ -69,7 +68,7 @@ function App() {
 
 
     return (
-        <MemoryRouter initialEntries={['/multiplayer']}>
+        <MemoryRouter initialEntries={['/home']}>
             <AppContextProvider>
                 <Navigation/>
                     {/* The router handles all the "manual" switching automatically */}
@@ -82,9 +81,6 @@ function App() {
 
                     <Route path="/home" element={<HomePage />}/>
                     <Route path="/multiplayer" element={<MultiplayerPage />}/>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
                     <Route path="/test" element={<TestPage />} />
                     <Route path="/join" element={<JoinPage />} />
                     <Route path="/create" element={<CreatePage />} />

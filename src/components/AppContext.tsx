@@ -159,7 +159,7 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         },
         "TURN-INFO": async (websocket, payload_) => {
             const payload = payload_ as ShotPayload;
-            const user_id = userIdRef.current;
+            const user_id = userIdRef.current || userId;
             console.log(userId, userIdRef);
             const wasMyTurn = (Number(payload.current_turn) === Number(userId)); // previous
             const isMyNextTurn = (Number(payload.next_turn) === Number(userId)); // next
@@ -410,12 +410,16 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         },
         "END-GAME": async (websocket, payload) => {
             const winner_id = (payload as {winner: number, stats: Record<string, EndGameStats>}).winner;
-            victory.current = (winner_id === userIdRef.current);
+            console.log("userIdRef.current", userIdRef.current, " userId", userId);
+            const user_id = userIdRef.current || userId;
+            victory.current = (winner_id == user_id);
             const allStats = (payload as {winner: number, stats: Record<string, EndGameStats>}).stats;
-            endGameStats.current = allStats[String(userIdRef.current)];
-            setIsTerminated(true);
-            navigate('/endgame');
+            endGameStats.current = allStats[String(user_id)];
+            if ("terminated" in payload) {
+                setIsTerminated(true);
+            }
             updateCode();
+            navigate('/endgame');
         },
         "REQUEST-RATE": async (websocket, payload) => {
             const topic = (payload as {topic: number}).topic;
@@ -595,7 +599,13 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
         const base_url = BASE_URL + '/create-user';
         const params = new URLSearchParams({name});
         const url = (name.length > 0)? `${base_url}?${params}` : base_url;
-        const result = await fetch(url, {});
+        const result = await fetch(url, {
+            method: 'GET', // или 'POST'
+            mode: 'cors',  // Явно указываем режим CORS
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }});
         const payload = await result.json();
         console.log(result);
 

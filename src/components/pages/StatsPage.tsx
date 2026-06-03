@@ -46,7 +46,7 @@ export default function StatsPage({}) {
 
     useEffect(() => {
         context.getStats()
-    })
+    }, [])
 
     const updateRef = useRef<HTMLDivElement>(null);
 
@@ -65,8 +65,8 @@ export default function StatsPage({}) {
                 </button>
             </div>
             <div className="stats-container">
-                <h1 style={{marginBlock: "10px"}}> Statystyka</h1>
-                <div>
+                <h1 className={"stats-header"}> Statystyka</h1>
+                <div className={"stats-button-row"}>
                     <button className={"stats-helper"} onClick={showUpdate}>Odśwież</button>
                     <button className={"stats-helper"} onClick={context.changeSort}>Sortuj</button>
                     <span ref={updateRef} className={"stats-helper stats-hidden"}>Aktualizacja...</span>

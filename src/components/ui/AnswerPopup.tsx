@@ -138,7 +138,7 @@ function answerCheker(str1: string, str2: string) {
 export default function AnswerPopup({show = false, text = "45.\tNauka biologiczna badająca wzajemne zależności między organizmami a środowiskiem i odwrotnie", answer = "biologia", correct = "ekologia", index = 1, onClick = () => {}}) {
     const inputRef = useRef<HTMLInputElement>(null);
     const popupRef = useRef<HTMLDivElement>(null);
-    const [word2, word1, status] = answerCheker(answer, correct);
+    const [word2, word1, status] = answerCheker(answer.trim(), correct.trim());
 
     const title = (() => {
         switch (status) {

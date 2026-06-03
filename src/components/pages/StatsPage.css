@@ -9,9 +9,10 @@
 .stats-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     flex-grow: 1;
+    max-width: 100%;
 }
 
 .stats-back-helper {
@@ -42,7 +43,6 @@
 .stats-grid-header {
     margin-inline: 12px;
     margin-block: 20px;
-
 }
 
 .stats-grid-cell {
@@ -97,4 +97,13 @@
     100% {
         opacity: 0; /* Hidden again at 1s */
     }
+}
+
+.stats-header {
+    align-self: center;
+    margin-block: 10px;
+}
+
+.stats-button-row {
+    align-self: center;
 }
