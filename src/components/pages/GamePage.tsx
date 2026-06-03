@@ -159,7 +159,7 @@ export default function GamePage(){
                 <h6 className={"game-subtitle"}>{context.myTurn.current? "Twoja kolej!" : "Kolej przeciwnika..."}</h6>
             </div>
             <div className={"game-indicators"}>
-                <Timer initialTime={60} onFinish={() => console.log('Time is up!')}/>
+                <Timer initialTime={180} onFinish={() => console.log('Time is up!')}/>
                 <Bullets count={Math.min(5, context.answers.length)}/>
             </div>
 
