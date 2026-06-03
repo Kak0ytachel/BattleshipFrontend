@@ -20,6 +20,7 @@ export default function EndGamePage() {
         const victoryRef = context.victory
         victoryRef.current = null;
         navigate("/home");
+        window.location.reload();
     }
     return (
         <div className={"endgame-container"}>

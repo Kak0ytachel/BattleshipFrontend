@@ -161,9 +161,9 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
             const payload = payload_ as ShotPayload;
             const user_id = userIdRef.current || userId;
             console.log(userId, userIdRef);
-            const wasMyTurn = (Number(payload.current_turn) === Number(userId)); // previous
-            const isMyNextTurn = (Number(payload.next_turn) === Number(userId)); // next
-            console.log("current", payload.current_turn, "next", payload.next_turn, "user_id (ref)", user_id, "userId (state)", userId, "isMyNextTurn", isMyNextTurn, "wasMyTurn", wasMyTurn)
+            const wasMyTurn = (Number(payload.current_turn) === Number(user_id)); // previous
+            const isMyNextTurn = (Number(payload.next_turn) === Number(user_id)); // next
+            console.log("current", payload.current_turn, "next", payload.next_turn, "user_id (ref)", userIdRef.current, "userId (state)", userId, "isMyNextTurn", isMyNextTurn, "wasMyTurn", wasMyTurn)
             myTurn.current = isMyNextTurn;
             if (wasMyTurn) {
                 setOpponentGrid(payload.grid); // prev my turn, their grid
@@ -171,7 +171,14 @@ export default function AppContextProvider({ children }: {children: ReactNode}) 
                 setOwnGrid(payload.grid);// prev opponent turn, my grid
             }
 
-            if (wasMyTurn && payload.event != "BOMB") {
+            if (payload.event == "START") {
+                setOpponentGrid(payload.grid);
+                setOwnGrid(payload.grid);
+                myPlacedBlocks.current = [];
+                opponentPlacedBlocks.current = [];
+            }
+
+            if (wasMyTurn && payload.event != "BOMB" && payload.event != "START") {
                 const questionIndex = payload.question as number;
                 const answer = payload.answer as string;
                 const correct = payload.correct as string;
