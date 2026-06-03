@@ -31,7 +31,7 @@ const SwipeLayout = () => {
     });
 
     // Handle dot clicks (optional direction matching)
-    const handleDotClick = (index) => {
+    const handleDotClick = (index: number) => {
         if (index === currentIndex) return;
         setAnimationClass(index > currentIndex ? 'slide-from-right' : 'slide-from-left');
         navigate(PAGES[index]);

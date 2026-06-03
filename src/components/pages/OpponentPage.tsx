@@ -25,7 +25,7 @@ export default function OpponentPage(){
             {/*    <Bullets/>*/}
             {/*</div>*/}
 
-            <GridStatic active={false} gridData={context.ownGrid} blocks={context.ownBlocks} haloBlocks={context.myPlacedBlocks.current}/>
+            <GridStatic active={false} gridData={context.ownGrid} blocks={context.ownBlocks} haloBlocks={context.myPlacedBlocks.current} onShoot={() => {}}/>
             <div className={"game-card-wrapper"} onClick={() => navigate("/log")}>
                 <TornCard>
                     <div className={"game-notification-card"}>

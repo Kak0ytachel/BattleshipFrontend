@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import "./QuestionPopup.css";
 import {useRef, useState} from "react";
 
-import questions from "/src/assets/questions.json";
+import questions from "../../../src/assets/questions.json";
 
 export default function QuestionPopup({show = false, index = 1, onClick = (s: string) => {console.log(s)}}) {
     const inputRef = useRef<HTMLInputElement>(null);

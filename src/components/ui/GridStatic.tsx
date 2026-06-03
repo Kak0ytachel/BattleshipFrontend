@@ -167,7 +167,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
 
     const gridRef = useRef<HTMLDivElement>(null!);
 
-    const cursorInGrid = useCallback((e: React.DragEvent) => {
+    const cursorInGrid = useCallback((e: any) => {
         const rect = gridRef.current?.getBoundingClientRect();
         if (!rect) return null;
         return { x: e.clientX - rect.left - GRID_PAD, y: e.clientY - rect.top - GRID_PAD };
@@ -209,7 +209,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
 
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: any) => {
         // Get the bounding rectangle of the container
         const CIRCLE_SIZE = 10;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -356,7 +356,7 @@ export default function GridStatic({gridData = {}, active = true, bombing = fals
                                     width:  ghost.w * CELL_SIZE + (ghost.w - 1) * GAP,
                                     height: ghost.h * CELL_SIZE + (ghost.h - 1) * GAP,
                                 }}
-                                onClick={(e) => onShoot(e, ghost.col, ghost.row)}
+                                onClick={(e: any) => onShoot(e, ghost.col, ghost.row)}
                             />
                         )}
 

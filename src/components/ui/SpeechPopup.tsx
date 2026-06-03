@@ -2,7 +2,7 @@ import TornCard from "../ui/TornCard.tsx";
 import "./QuestionPopup.css";
 import {useRef, useState} from "react";
 import "./SpeechPopup.css";
-import topics from "/src/assets/topics.json";
+import topics from "../../../src/assets/topics.json";
 
 
 export default function SpeechPopup({show = false, index = 2, self = false, onClick = (value: number) => {}}) {
@@ -23,7 +23,7 @@ export default function SpeechPopup({show = false, index = 2, self = false, onCl
         onClick(value);
     }
 
-    const text = topics[index] || "ERROR";
+    const text = (topics as {[key: string]: string})[String(index)] || "ERROR";
 
 
     return (

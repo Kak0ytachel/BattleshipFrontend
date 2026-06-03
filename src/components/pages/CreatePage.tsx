@@ -56,7 +56,7 @@ export default function CreatePage() {
 
                     <h3>Kod gry</h3>
 
-                    <OtpOutput value_={context.ownGameCode} length={6}/>
+                    <OtpOutput value_={context.ownGameCode || undefined} length={6}/>
                     <div><hr className={"short-hr"}/></div>
 
                     <span className={"join-description"}>
