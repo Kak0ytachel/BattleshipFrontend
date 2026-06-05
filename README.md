@@ -25,6 +25,26 @@ Design in Figma was made by Vilena Shastak. Unfortunately a couple of elements w
 
 ## Technical implementation
 
+The project implements the Client-Server architecture and consist of a separate Frontend, written with TypeScript, React and Vite (this repository), a separate Backend in TypeScript with Fastify ( [`Kak0ytachel/BattleshipFrontend`](https://github.com/Kak0ytachel/BattleshipBackend) ), that connects to a Postgress database. 
+
+The Frontend and the Backend communicate via several REST API endpoints and a WebSocket connection.
+
+### REST API
+
+The REST API includes 4 endpoints:
+- GET `/create-user` - takes `name` as the only query parameter, creates a user account and returns `user_id`, JWT `access_token` and `refresh_token`
+- GET `/update-token` - takes 'refresh_token', returns new `access_token`, `refresh_token` along with `user_id`. 
+- GET `/websocket-auth` - takes `access_token`, returns a short-term JWT `tiket` with a lifespan of 1 minute, that allows to securely connect to the websocket
+- GET `/websocket` - takes `ticket` and upgrades the connection to the WebSocket protocol 
+
+### Authorization and JWT
+
+The project uses JSON Web Tokens to authorize users. At the moment, the project does not have a propper login / password authorization due to the lack of necessity. When first opening the page, the app shows the "enter your name" page. Then it uses the name to create an account via the corresponding endpoint. The account is tied to the browser by storing user_id and JWT tokens in browser's localStorage. An account stores only stores the active game session and some statistics, so there is no need to log in it from another device. When an account is created, the app refreshes the token if needed, generates a ticket (a short-term JWT with a lifespan of 1 minute) and uses it to connect to the WebSocket endpoint.
+
+### WebSocket
+
+Both the server and the client apps implement a semi-custom protocol of WebSocket. Each message consist of request type, written in all caps with "-" symbols as word separators, and a JSON-formatted string of the request payload. 
+
 ## Video demo
 
 ## Installation
@@ -50,77 +70,3 @@ Many thanks to:
 
 
 
-
-
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
