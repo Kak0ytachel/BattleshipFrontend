@@ -1,4 +1,50 @@
-# React + TypeScript + Vite
+
+<img width="576" height="99" alt="Image" src="https://github.com/user-attachments/assets/52fbe599-1969-46b8-a69e-9997b5128308" />
+
+# Battleship
+
+"Bitwa morska" (eng. Battleship) is a Frontend Web Application for the [Battleship](https://en.wikipedia.org/wiki/Battleship_(game)) game being built with TypeScript, React & Vite
+
+
+## Idea
+
+Built as a board-like game at a polish course, as a game to revise the vocabulary before the final polish exam while competing with groupmates.
+
+
+## Key differences
+
+- Has 6 x 6 grid and less ships ( 3x1 - 1, 2x1 - 2, 1x1 - 3 )
+- Has so-called bullets, required to shoot enemy's ships. To get a bullet, a player need to answer a vocabulary question. If the answer is correct, the player gets a live round, otherwise a blank one. The rounds can be stacked, and it is unknown to the player, wherher a round is a real or a blank until the shot is fired. 
+- Has an addition of so-called bombs. To deploy a bomb, player needs to answer a conversational question. Then both the player and his opponent rate the speech on scale from 1 to 5, and a bomb hits several (1-5) cells within the selected 3x3 area counted as a random value between the lower and the higher grade of the speech.
+
+## Project design
+
+## Technical implementation
+
+## Video demo
+
+## Installation
+
+## Contributors
+
+
+
+<br>
+
+<br>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+
+
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
