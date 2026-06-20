@@ -47,6 +47,8 @@ Both the server and the client apps implement a semi-custom protocol of WebSocke
 
 ## Video demo
 
+https://github.com/user-attachments/assets/1f93572a-fec3-43a9-9736-fac99d5b339c
+
 ## Installation
 
 ## Contributors
