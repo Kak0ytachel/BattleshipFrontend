@@ -47,13 +47,21 @@ Both the server and the client apps implement a semi-custom protocol of WebSocke
 
 ## Frontend implementation
 
-### General
+The project implements the Client-Server architecture and consist of a separate Frontend, written with TypeScript, React and Vite (this repository), a separate Backend in TypeScript with Fastify ( [`Kak0ytachel/BattleshipFrontend`](https://github.com/Kak0ytachel/BattleshipBackend) ), that connects to a Postgress database. 
+
+### React App
+
+The React app is build aroung React Context (`useContext` hook), that stores all global variables (`useState`, `useRef` and `useLocalStorage` for saving intersessional data using [usehooks-ts](https://www.npmjs.com/package/usehooks-ts)) and global logic like 'useEffect' hooks, JWT token exchange, setting up WebSocket connection and handling incoming events. 
+
+The App utilizes `MemoryRouter` from `react-router-dom`. It allows to route in-app screens without changing page's url. Each page is built as a separate react component. UI element components encapsulate own variables and logics, allowing them to me reused (like in-game timer, game grid, torn cards, etc). The app includes several popups being shown directly inside the MemoryRouter on top of any page. 
+
+The app includes 14 pages, 11 reusable and several page-specific components. 
 
 ### Drag-and-drop
 
 <img width="600" height="600" alt="drag-and-drop-demo" src="https://github.com/user-attachments/assets/9917e679-a0d5-4938-8193-9db56fa56938" />
 
-
+The app includes drag-and-drop component for placing ships. It utilizes HTML Drag-and-drop API for object dragging and manually calculates placement position in real time, showing red/blue "ghost" (color depends on whether the ship can be placed there). It also allows ship rotation on click and returning the ship back to the container on double click. 
 
 
 
@@ -70,17 +78,9 @@ Many thanks to:
 - Yanina Maseichuk for the great questions in polish: 80 vocabulary questions and 11 communication topics
 
 
-<br>
-
-<br>
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
+## Known issues
+- HTML Drag-and-drop API does not work on iOS due to platform-specific Drag-and-drop.
+- The in-game timer is not fully implemented yet and for now does not pass the turn to another player when the time is out
 
 
 
