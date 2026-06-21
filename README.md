@@ -45,6 +45,18 @@ The project uses JSON Web Tokens to authorize users. At the moment, the project 
 
 Both the server and the client apps implement a semi-custom protocol of WebSocket. Each message consist of request type, written in all caps with "-" symbols as word separators, and a JSON-formatted string of the request payload. 
 
+## Frontend implementation
+
+### General
+
+### Drag-and-drop
+
+<img width="600" height="600" alt="drag-and-drop-demo" src="https://github.com/user-attachments/assets/9917e679-a0d5-4938-8193-9db56fa56938" />
+
+
+
+
+
 ## Video demo
 
 https://github.com/user-attachments/assets/1f93572a-fec3-43a9-9736-fac99d5b339c
